@@ -1,0 +1,132 @@
+[gd_scene load_steps=14 format=3 uid="uid://b71o60lthdae"]
+
+[ext_resource type="Texture2D" uid="uid://bn51trfs06fb6" path="res://Sprites/Beach.png" id="1_b2bpf"]
+[ext_resource type="PackedScene" uid="uid://ky734wjre1ge" path="res://Scenes/Player1.tscn" id="1_iukft"]
+[ext_resource type="PackedScene" uid="uid://dqr5ph4xskws6" path="res://Scenes/Player2.tscn" id="2_gl6un"]
+[ext_resource type="PackedScene" uid="uid://bbqjkumdn0v7l" path="res://Scenes/Ball.tscn" id="3_kldst"]
+[ext_resource type="PackedScene" uid="uid://6y6ohqx162fj" path="res://Scenes/Volleyball_net.tscn" id="4_b2bpf"]
+[ext_resource type="Script" uid="uid://go3pr1dsbjpg" path="res://Scenes/multi_cam.gd" id="5_7lihs"]
+[ext_resource type="PackedScene" uid="uid://dcd3l80giufi3" path="res://Scenes/score_system.tscn" id="7_fgofq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b2bpf"]
+size = Vector2(2780, 2004)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_kldst"]
+distance = -1544.0
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_kldst"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_7lihs"]
+distance = -374.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7lihs"]
+size = Vector2(11958, 2467)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_fgofq"]
+
+[node name="Game" type="Node2D"]
+
+[node name="Beach" type="Sprite2D" parent="."]
+position = Vector2(642, -1373)
+scale = Vector2(3.5, 3.5)
+texture = ExtResource("1_b2bpf")
+
+[node name="zones" type="Node" parent="."]
+
+[node name="zone_1" type="Area2D" parent="zones"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="zones/zone_1"]
+position = Vector2(642, -278)
+shape = SubResource("RectangleShape2D_b2bpf")
+debug_color = Color(0.96156675, 0.1370185, 0.3667434, 0.41960785)
+
+[node name="zone_2_L" type="Area2D" parent="zones"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="zones/zone_2_L"]
+position = Vector2(-1999, -269)
+shape = SubResource("RectangleShape2D_b2bpf")
+debug_color = Color(0.69456863, 0.48997962, 0.20540228, 0.41960785)
+
+[node name="zone_2_R" type="Area2D" parent="zones"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="zones/zone_2_R"]
+position = Vector2(3312, -275)
+shape = SubResource("RectangleShape2D_b2bpf")
+debug_color = Color(0.69456863, 0.48997962, 0.20540228, 0.41960785)
+
+[node name="Players1_R" parent="." instance=ExtResource("1_iukft")]
+position = Vector2(2019, 442)
+
+[node name="Player2_L" parent="." instance=ExtResource("2_gl6un")]
+position = Vector2(-41, 474)
+
+[node name="Ball_net" parent="." instance=ExtResource("4_b2bpf")]
+position = Vector2(683.00006, 576)
+scale = Vector2(0.66, 0.66)
+
+[node name="Left_Bound" type="StaticBody2D" parent="."]
+position = Vector2(-2408, 296)
+rotation = 1.5707964
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Left_Bound"]
+position = Vector2(-48.000023, -568)
+shape = SubResource("WorldBoundaryShape2D_kldst")
+
+[node name="Right_Bound" type="StaticBody2D" parent="."]
+position = Vector2(3729, -12)
+rotation = -1.5707964
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Right_Bound"]
+position = Vector2(-11.999973, -606)
+shape = SubResource("WorldBoundaryShape2D_kldst")
+
+[node name="Bottom_Ground" type="StaticBody2D" parent="."]
+position = Vector2(617, 394)
+disable_mode = 1
+physics_material_override = SubResource("PhysicsMaterial_kldst")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bottom_Ground"]
+position = Vector2(-44, 142)
+shape = SubResource("WorldBoundaryShape2D_7lihs")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(661, -296)
+offset = Vector2(0, 5)
+zoom = Vector2(0.27, 0.27)
+limit_top = -10000
+limit_right = 10000
+limit_bottom = 900
+limit_smoothed = true
+script = ExtResource("5_7lihs")
+
+[node name="Ball" parent="." instance=ExtResource("3_kldst")]
+position = Vector2(1893, -273)
+scale = Vector2(1, 1)
+linear_velocity = Vector2(0, -5)
+
+[node name="Gravity_Increase" type="Area2D" parent="."]
+position = Vector2(-8, -2083)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gravity_Increase"]
+position = Vector2(736, -1565)
+shape = SubResource("RectangleShape2D_7lihs")
+debug_color = Color(0.99215686, 0.80784315, 0.7294118, 0.7647059)
+
+[node name="Out_of_Bound_top" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Out_of_Bound_top"]
+position = Vector2(355, -4786)
+rotation = 3.1415927
+shape = SubResource("WorldBoundaryShape2D_fgofq")
+debug_color = Color(0.9478534, 0.23084643, 0, 0.41960785)
+
+[node name="Score_System_1" parent="." instance=ExtResource("7_fgofq")]
+position = Vector2(233.00003, -207.99998)
+scale = Vector2(11.75, 11.75)
+
+[node name="Score_System" parent="." instance=ExtResource("7_fgofq")]
+position = Vector2(1085, -214.99998)
+scale = Vector2(11.63, 11.63)

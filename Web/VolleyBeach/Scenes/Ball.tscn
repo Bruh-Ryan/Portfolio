@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://bbqjkumdn0v7l"]
+
+[ext_resource type="Texture2D" uid="uid://sj7fg0f5m6lx" path="res://Sprites/VolleyBall.png" id="1_7nh6h"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_7nh6h"]
+friction = 0.2
+bounce = 0.8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_eb1ap"]
+radius = 106.008385
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7nh6h"]
+radius = 115.36416
+
+[node name="Volley_ball" type="RigidBody2D"]
+scale = Vector2(1.5, 1.5)
+mass = 0.15
+physics_material_override = SubResource("PhysicsMaterial_7nh6h")
+linear_velocity = Vector2(1, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("1_7nh6h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_eb1ap")
+debug_color = Color(0.78565633, 0.4163134, 0.33041462, 0.41960785)
+
+[node name="Area_hit" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area_hit"]
+shape = SubResource("CircleShape2D_7nh6h")
+debug_color = Color(0, 0.61865395, 0.57894206, 0.41960785)

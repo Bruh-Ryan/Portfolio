@@ -1,0 +1,82 @@
+[gd_scene load_steps=10 format=3 uid="uid://ky734wjre1ge"]
+
+[ext_resource type="Script" uid="uid://baa3nnjt8rtm4" path="res://Script/Player_Right.gd" id="1_dvont"]
+[ext_resource type="Texture2D" uid="uid://uhng6l55afio" path="res://Sprites/Player.png" id="2_n5fpy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dvont"]
+atlas = ExtResource("2_n5fpy")
+region = Rect2(407, 0, 407, 680)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1yta1"]
+atlas = ExtResource("2_n5fpy")
+region = Rect2(910, 0, 455, 680)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ale3"]
+atlas = ExtResource("2_n5fpy")
+region = Rect2(0, 0, 379, 680)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_o247r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dvont")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1yta1")
+}],
+"loop": true,
+"name": &"jump_action",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ale3")
+}],
+"loop": true,
+"name": &"touch_ball",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n5fpy"]
+size = Vector2(298, 1100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dvont"]
+size = Vector2(271, 8)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_n5fpy"]
+radius = 154.0
+height = 632.0
+
+[node name="Right" type="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
+script = ExtResource("1_dvont")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_o247r")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="below" type="CollisionShape2D" parent="."]
+position = Vector2(13, 96)
+shape = SubResource("RectangleShape2D_n5fpy")
+
+[node name="Head" type="CollisionShape2D" parent="."]
+position = Vector2(11, -466)
+shape = SubResource("RectangleShape2D_dvont")
+debug_color = Color(0.8256223, 0.27875757, 0.7168668, 0.41960785)
+
+[node name="Hit_area" type="Area2D" parent="."]
+position = Vector2(-1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hit_area"]
+position = Vector2(-311, -229)
+shape = SubResource("CapsuleShape2D_n5fpy")
+
+[node name="Spawn_Marker2D" type="Marker2D" parent="."]
+position = Vector2(-752, -2494)

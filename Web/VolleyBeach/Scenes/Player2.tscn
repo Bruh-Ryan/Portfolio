@@ -1,0 +1,82 @@
+[gd_scene load_steps=10 format=3 uid="uid://dqr5ph4xskws6"]
+
+[ext_resource type="Script" uid="uid://dt4qn0cackdol" path="res://Script/Player_Left.gd" id="1_kfthp"]
+[ext_resource type="Texture2D" uid="uid://uhng6l55afio" path="res://Sprites/Player.png" id="2_kfthp"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_encxe"]
+atlas = ExtResource("2_kfthp")
+region = Rect2(403, 0, 403, 680)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dn4j3"]
+atlas = ExtResource("2_kfthp")
+region = Rect2(910, 0, 455, 676)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kfthp"]
+atlas = ExtResource("2_kfthp")
+region = Rect2(0, 0, 379, 676)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u8k5t"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_encxe")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dn4j3")
+}],
+"loop": true,
+"name": &"jump_action",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kfthp")
+}],
+"loop": true,
+"name": &"touch_ball",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dvont"]
+size = Vector2(271, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dn4j3"]
+size = Vector2(286, 1103)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dn4j3"]
+radius = 152.0
+height = 660.0
+
+[node name="Left" type="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
+script = ExtResource("1_kfthp")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_u8k5t")
+animation = &"idle"
+flip_h = true
+
+[node name="body" type="CollisionShape2D" parent="."]
+position = Vector2(-31.5, -468)
+shape = SubResource("RectangleShape2D_dvont")
+debug_color = Color(0.74861336, 0.35509473, 0.7531218, 0.41960785)
+
+[node name="below" type="CollisionShape2D" parent="."]
+position = Vector2(-29, 89.5)
+shape = SubResource("RectangleShape2D_dn4j3")
+
+[node name="Hit_area" type="Area2D" parent="."]
+position = Vector2(-1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hit_area"]
+position = Vector2(287, -277)
+shape = SubResource("CapsuleShape2D_dn4j3")
+
+[node name="Spawn_Marker2D" type="Marker2D" parent="."]
+position = Vector2(1110, -1896)

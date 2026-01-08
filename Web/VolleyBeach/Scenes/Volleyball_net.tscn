@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://6y6ohqx162fj"]
+
+[ext_resource type="Texture2D" uid="uid://dh133gafpbiqn" path="res://Sprites/VolleyBall net.png" id="1_0fhoo"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_0fhoo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_i5pyu"]
+size = Vector2(162, 908)
+
+[node name="StaticBody2D" type="StaticBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_0fhoo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-11, 52)
+shape = SubResource("RectangleShape2D_i5pyu")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(7.0000114, -140.00003)
+scale = Vector2(0.79200006, 2.5760002)
+texture = ExtResource("1_0fhoo")
