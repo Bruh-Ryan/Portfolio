@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Paul Tirkey | Retro Portfolio</title>
+    <meta name="description" content="Portfolio of Ryan Paul Tirkey - Backend Developer & Data Science Student">
+    <link rel="stylesheet" href="portfolio.css">
+    <!-- Retro Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Courier+Prime:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Aesthetics Overlays -->
+    <div class="film-grain"></div>
+    <!-- <div class="scanlines"></div> Optional: removed for cleaner paper feel as requested -->
+
+    <!-- Hero / Welcome Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">RYAN PAUL TIRKEY</h1>
+            <p class="hero-subtitle">BACKEND DEVELOPER & DATA SCIENCE STUDENT</p>
+            <p class="hero-intro">
+                Passionate about building scalable backend systems, real-time data platforms, and performance-optimized
+                APIs.
+            </p>
+            <div class="scroll-indicator">
+                ↓ SCROLL TO EXPLORE ↓
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation Reel (Slides in on scroll) -->
+    <nav class="film-reel" id="filmReel" aria-label="Main Navigation">
+        <div class="film-strip-holes left-holes"></div>
+        <div class="film-strip-holes right-holes"></div>
+
+        <!-- 1. About Me -->
+        <div class="film-frame" data-section="about" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image abstract-bg abstract-about"></div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">01. About Me</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Tech Stack -->
+        <div class="film-frame" data-section="tech" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image">
+                    <img src="assets/tech-java.jpg" alt="Tech Stack" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">02. Tech Stack</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Book Review Platform -->
+        <div class="film-frame" data-section="project1" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image">
+                    <img src="assets/project-editor.jpg" alt="Books Platform"
+                        style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">03. Books Platform</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. API Management System -->
+        <div class="film-frame" data-section="project2" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image">
+                    <img src="assets/project-terminal.jpg" alt="API System"
+                        style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">04. API System</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Real-Time Data -->
+        <div class="film-frame" data-section="project3" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image abstract-bg abstract-proj3"></div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">05. Data Platform</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Godot Game -->
+        <div class="film-frame" data-section="project4" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image">
+                    <img src="assets/game-wasd.jpg" alt="Godot Game" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">06. Godot Game</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Experiments -->
+        <div class="film-frame" data-section="experiments" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image abstract-bg abstract-experiments"></div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">07. Experiments</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Contact -->
+        <div class="film-frame" data-section="contact" role="button" tabindex="0">
+            <div class="frame-border">
+                <div class="frame-image">
+                    <img src="assets/contact-mail.jpg" alt="Contact" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="frame-nav-label">
+                    <span class="nav-text">08. Contact</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content-container">
+
+        <!-- 1. About / Education -->
+        <section class="content-section" id="about">
+            <div class="section-content">
+                <h2 class="section-title">About Me</h2>
+
+                <h4 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--color-highlight);">Ryan Paul Tirkey
+                </h4>
+
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    I'm a backend-focused developer who loves digging into the "how" and "why" of systems.
+                    I don't just write code; I design architectures that scale. Whether it's optimizing database
+                    queries,
+                    structuring clean microservices, or building real-time data pipelines, I enjoy the challenge of
+                    making things efficient and robust.
+                </p>
+
+                <div style="margin-bottom: 2rem;">
+                    <h5
+                        style="font-family: var(--font-retro); color: var(--color-dark-green); margin-bottom: 10px; font-size: 1.2rem;">
+                        // KEY BACKEND FOCUS
+                    </h5>
+                    <ul style="border-left: 3px solid var(--color-highlight); padding-left: 15px;">
+                        <li><strong>Scalability:</strong> Designing systems that handle growth gracefully.</li>
+                        <li><strong>Efficiency:</strong> Writing optimized code that saves resources.</li>
+                        <li><strong>Structure:</strong> Clean architecture and maintainable codebases.</li>
+                    </ul>
+                </div>
+
+                <p style="margin-bottom: 2rem;">
+                    <strong>Email:</strong> <a href="mailto:ryanpaultirkey.work@gmail.com"
+                        style="color:var(--color-dark-green)">ryanpaultirkey.work@gmail.com</a>
+                </p>
+
+                <div style="margin-top:10px; margin-bottom: 2rem;">
+                    <a href="https://linkedin.com/in/ryan-paul-tirkey" target="_blank" class="retro-button secondary"
+                        style="font-size:1rem; padding:5px 10px;">LinkedIn</a>
+                    <a href="https://github.com/Bruh-Ryan" target="_blank" class="retro-button secondary"
+                        style="font-size:1rem; padding:5px 10px;">GitHub</a>
+                </div>
+
+                <h3>Education</h3>
+                <div class="education-block">
+                    <h4>B.Tech - Computer Science & Engineering (Data Science)</h4>
+                    <p>Dayananda Sagar College of Engineering | 2022 – 2026</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Tech Stack -->
+        <section class="content-section" id="tech">
+            <div class="section-content">
+                <h2 class="section-title">Tech Stack</h2>
+
+                <div class="tech-category">
+                    <h4>Backend & Languages</h4>
+                    <p>Java, Python, Spring Boot, Flask, JavaFX</p>
+                </div>
+
+                <div class="tech-category">
+                    <h4>Databases</h4>
+                    <p>MongoDB, SQL, Schema Design, Query Optimization, Indexing, Aggregation</p>
+                </div>
+
+                <div class="tech-category">
+                    <h4>DevOps & Tools</h4>
+                    <p>Git/GitHub, Maven, Docker, Kafka, Swagger/OpenAPI</p>
+                </div>
+
+                <div class="tech-category">
+                    <h4>Core Concepts</h4>
+                    <p>Data Structures & Algorithms, REST APIs, Microservices, Performance Tuning</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Project: Book Review -->
+        <section class="content-section" id="project1">
+            <div class="section-content">
+                <h2 class="section-title">Book Review Platform</h2>
+                <p><strong>Stack:</strong> Spring Boot, MongoDB, Streamlit, Docker, Kafka, Google Gemini API</p>
+
+                <ul>
+                    <li>Built a comprehensive REST API for book management and search, storing data in MongoDB and
+                        serving a Streamlit UI.</li>
+                    <li>Implemented event-driven tracking using Kafka for user activity logging.</li>
+                    <li>Integrated Google Gemini API for AI-powered summaries and recommendations.</li>
+                </ul>
+
+                <div style="margin-top: 2rem;">
+                    <a href="https://github.com/Bruh-Ryan/booksreview" target="_blank"
+                        class="retro-button secondary">GitHub Repo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Project: API Management -->
+        <section class="content-section" id="project2">
+            <div class="section-content">
+                <h2 class="section-title">RESTful API System</h2>
+                <p><strong>Stack:</strong> Spring Boot, MongoDB, Swagger/OpenAPI</p>
+
+                <ul>
+                    <li>Owned end-to-end API delivery, ensuring standardized response formats and error handling.</li>
+                    <li>Implemented comprehensive documentation using Swagger UI for easy developer adoption.</li>
+                    <li>Focused on scalable schema design and efficient data retrieval patterns.</li>
+                </ul>
+
+                <div style="margin-top: 2rem;">
+                    <a href="https://github.com/Bruh-Ryan/Swagger-Project" target="_blank"
+                        class="retro-button secondary">GitHub Repo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Project: Real-Time Data -->
+        <section class="content-section" id="project3">
+            <div class="section-content">
+                <h2 class="section-title">Real-Time Data Platform</h2>
+                <p><strong>Stack:</strong> Spring Boot backend + Python Streamlit frontend</p>
+
+                <ul>
+                    <li>Delivered a real-time analytics dashboard visualizing live data streams.</li>
+                    <li>Optimized backend latency for high-frequency data ingestion.</li>
+                    <li>Seamlessly integrated Java backend logic with Python-based visualization tools.</li>
+                </ul>
+
+                <div style="margin-top: 2rem;">
+                    <a href="https://github.com/Bruh-Ryan/stevejobs" target="_blank"
+                        class="retro-button secondary">GitHub Repo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Project: Volley Beach Godot Game -->
+        <section class="content-section" id="project4">
+            <div class="section-content">
+                <div class="game-layout">
+                    <!-- Left Side: Thumbnail & Play -->
+                    <div class="game-left">
+                        <h3>Volley Beach</h3>
+                        <div class="game-thumbnail-container" onclick="openGame()">
+                            <!-- Updated path for nested structure -->
+                            <img src="VolleyBeach/exports/VolleyBeach/VolleyBeach.png" alt="Volley Beach Game"
+                                class="game-thumb">
+                        </div>
+                        <button class="retro-button play-game-btn" onclick="openGame()">Wanna Play!</button>
+                    </div>
+
+                    <!-- Right Side: Description -->
+                    <div class="game-right">
+                        <p>
+                            A small 2D game about 2 players locally playing volleyball.
+                            Challenge your friend in this pixel-art style beach showdown!
+                        </p>
+                        <p class="note" style="font-size: 0.9rem; color: var(--color-dark-green); opacity: 0.8;">
+                            * This is a demo; more features yet to be added.
+                        </p>
+                        <ul style="margin-top: 1rem;">
+                            <li>Local Multiplayer (2 Players)</li>
+                            <li>Physics-based Ball Movement</li>
+                            <li>Classic Retro Arcade Vibes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Experiments -->
+        <section class="content-section" id="experiments">
+            <div class="section-content">
+                <h2 class="section-title">Minor Experiments</h2>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3>Authentication Service (Add-on)</h3>
+                    <p><strong>Stack:</strong> Spring Boot, MongoDB, Google OAuth2</p>
+                    <ul>
+                        <li>Implemented secure OAuth2 sign-in integration with Google.</li>
+                        <li>Managed session tokens and user role-based security.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3>Video Processing Experiments</h3>
+                    <p><strong>Stack:</strong> Streamlit + WebRTC, OpenCV/MediaPipe</p>
+                    <ul>
+                        <li>Built a Streamlit/WebRTC pipeline for real-time video feed processing.</li>
+                        <li>Analyzed trade-offs between browser-side and server-side frame manipulation.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Contact / Competencies -->
+        <section class="content-section" id="contact">
+            <div class="section-content">
+                <h2 class="section-title">Core Competencies & Contact</h2>
+
+                <div class="education-block">
+                    <h3>Core Competencies</h3>
+                    <ul>
+                        <li><strong>Backend:</strong> REST API design + Microservices + Database Optimization +
+                            Performance Tuning.</li>
+                        <li><strong>Full-Stack:</strong> End-to-end feature ownership + Rapid Prototyping + Cross-team
+                            Collaboration.</li>
+                        <li><strong>Problem-Solving:</strong> DSA + Debugging + Latency Reduction + Profiling + Code
+                            Quality.</li>
+                        <li><strong>Mindset:</strong> Ship fast w/ high quality + Iterate based on metrics + Care about
+                            Product Impact.</li>
+                    </ul>
+                </div>
+
+                <h3>Get In Touch</h3>
+                <p>Open to opportunities in Backend Engineering and Data Platforms.</p>
+
+                <div style="margin-top: 2rem;">
+                    <a href="mailto:ryanpaultirkey.work@gmail.com" class="retro-button accent">Email Me</a>
+                    <a href="https://linkedin.com/in/ryan-paul-tirkey" target="_blank" class="retro-button">LinkedIn</a>
+                    <a href="https://github.com/Bruh-Ryan" target="_blank" class="retro-button secondary">GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>© 2025 Ryan Paul Tirkey | Built with Retro Vibes</p>
+        </footer>
+    </main>
+
+    <div class="video-overlay" id="videoOverlay" role="dialog" aria-modal="true">
+        <div class="video-container">
+            <button class="close-video" onclick="closeVideoOverlay()">✕</button>
+            <div class="video-wrapper">
+                <iframe id="videoFrame" src="" frameborder="0" allow="autoplay; encrypted-media"
+                    allowfullscreen></iframe>
+                <div style="position: absolute; z-index:-1;">Loading Video...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Overlay -->
+    <div class="game-overlay" id="gameOverlay">
+        <div class="game-frame-container">
+            <!-- Source will be set via JS -->
+            <iframe id="gameFrame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+
+        <!-- 8-Bit Controls Overlay -->
+        <div class="controls-overlay">
+            <div class="control-group p1">
+                <h4>P1 (LEFT)</h4>
+                <p>[W,A,S,D] Move</p>
+                <p>[E] Smash</p>
+            </div>
+            <div class="control-group sys">
+                <h4>SYSTEM</h4>
+                <p>[J] Reset Left</p>
+                <p>[K] Reset Right</p>
+            </div>
+            <div class="control-group p2">
+                <h4>P2 (RIGHT)</h4>
+                <p>[ARROWS] Move</p>
+                <p>[?] Smash</p>
+            </div>
+        </div>
+        <button class="retro-button close-game-btn" type="button" onclick="closeGame()"
+            style="position: relative; z-index: 200; pointer-events: auto; background: var(--color-highlight); color: white; border: 2px solid white; margin-top: 15px;">Rest
+            (Close Game)</button>
+    </div>
+
+    <script src="portfolio.js"></script>
+</body>
+
+</html>
