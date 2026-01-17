@@ -139,6 +139,7 @@ function openVideo(url) {
             // Clear any existing sources
             nativeVideo.innerHTML = '';
             nativeVideo.removeAttribute('src');
+            //
 
             // For Cloudinary videos, create multiple source formats
             if (url.includes('cloudinary.com') && url.includes('/upload/')) {
