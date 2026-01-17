@@ -135,14 +135,31 @@ function openVideo(url) {
             nativeVideo.style.display = 'block';
             nativeVideo.style.zIndex = '20'; // Force on top
 
-            // OPTIMIZATION: Inject f_auto,q_auto for best format/quality if using Cloudinary
-            // This fixes "No video with supported format" errors by serving WebM/MP4 based on browser support
-            let finalVideoUrl = url;
-            if (url.includes('cloudinary.com') && url.includes('/upload/') && !url.includes('/f_auto')) {
-                finalVideoUrl = url.replace('/upload/', '/upload/f_auto,q_auto/');
+            // OPTIMIZATION: Use multiple source formats for maximum browser compatibility
+            // Clear any existing sources
+            nativeVideo.innerHTML = '';
+            nativeVideo.removeAttribute('src');
+
+            // For Cloudinary videos, create multiple source formats
+            if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+                // WebM source (Chrome/Firefox)
+                const sourceWebM = document.createElement('source');
+                sourceWebM.src = url.replace('/upload/', '/upload/f_auto:video,q_auto,vc_vp9/').replace(/\.(mp4|mov)$/i, '.webm');
+                sourceWebM.type = 'video/webm';
+
+                // MP4 H.264 source (Safari/iOS)
+                const sourceMP4 = document.createElement('source');
+                sourceMP4.src = url.replace('/upload/', '/upload/f_auto:video,q_auto,vc_h264/').replace(/\.(webm|mov)$/i, '.mp4');
+                sourceMP4.type = 'video/mp4';
+
+                nativeVideo.appendChild(sourceWebM);
+                nativeVideo.appendChild(sourceMP4);
+            } else {
+                // For non-Cloudinary URLs, use direct src
+                nativeVideo.src = url;
             }
 
-            nativeVideo.src = finalVideoUrl;
+            nativeVideo.load(); // Reload with new sources
             nativeVideo.play().catch(e => console.log('Autoplay blocked:', e));
         }
     } else {
