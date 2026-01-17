@@ -134,7 +134,15 @@ function openVideo(url) {
         if (nativeVideo) {
             nativeVideo.style.display = 'block';
             nativeVideo.style.zIndex = '20'; // Force on top
-            nativeVideo.src = url;
+
+            // OPTIMIZATION: Inject f_auto,q_auto for best format/quality if using Cloudinary
+            // This fixes "No video with supported format" errors by serving WebM/MP4 based on browser support
+            let finalVideoUrl = url;
+            if (url.includes('cloudinary.com') && url.includes('/upload/') && !url.includes('/f_auto')) {
+                finalVideoUrl = url.replace('/upload/', '/upload/f_auto,q_auto/');
+            }
+
+            nativeVideo.src = finalVideoUrl;
             nativeVideo.play().catch(e => console.log('Autoplay blocked:', e));
         }
     } else {
