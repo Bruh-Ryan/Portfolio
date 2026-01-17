@@ -650,8 +650,11 @@ ul li::before {
 
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
+    /* Remove fixed 16:9 ratio to allow portrait videos */
+    /* padding-bottom: 56.25%; */
+    width: 100%;
+    height: 80vh;
+    /* dynamic height based on viewport */
     background: #000;
     display: flex;
     align-items: center;
@@ -660,12 +663,21 @@ ul li::before {
     font-family: var(--font-retro);
 }
 
-.video-wrapper iframe {
+.video-wrapper iframe,
+.video-wrapper video {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    object-fit: contain;
+    /* Ensure video isn't stretched */
+}
+
+/* Force native video on top when active */
+.video-wrapper video {
+    z-index: 10;
+    background: black;
 }
 
 /* Footer */

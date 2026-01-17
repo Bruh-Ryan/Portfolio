@@ -116,33 +116,53 @@ document.querySelector('.scroll-indicator')?.addEventListener('click', () => {
 // ========================================
 
 const videoOverlay = document.getElementById('videoOverlay');
-const videoFrame = document.getElementById('videoFrame');
-
-window.openVideoOverlay = function (projectId) {
-    // Legacy support if called from HTML onclick
-    const frame = document.querySelector(`.film-frame[data-section="${projectId}"]`);
-    if (frame) {
-        const url = frame.getAttribute('data-video');
-        if (url) openVideo(url);
-    }
-};
+const nativeVideo = document.getElementById('nativeVideo');
 
 function openVideo(url) {
-    if (!videoOverlay || !videoFrame) return;
+    if (!videoOverlay) return;
 
-    // Add autoplay parameter if not present
-    const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
-
-    videoFrame.src = finalUrl;
     videoOverlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // Lock scroll
+
+    // Check if it's a direct video file (MP4)
+    if (url.toLowerCase().endsWith('.mp4') || url.toLowerCase().includes('cloudinary.com')) {
+        // Use Native Video Player
+        if (videoFrame) {
+            videoFrame.style.display = 'none';
+            videoFrame.src = '';
+        }
+        if (nativeVideo) {
+            nativeVideo.style.display = 'block';
+            nativeVideo.style.zIndex = '20'; // Force on top
+            nativeVideo.src = url;
+            nativeVideo.play().catch(e => console.log('Autoplay blocked:', e));
+        }
+    } else {
+        // Use Iframe (YouTube/Vimeo)
+        if (nativeVideo) {
+            nativeVideo.style.display = 'none';
+            nativeVideo.pause();
+            nativeVideo.src = '';
+        }
+        if (videoFrame) {
+            videoFrame.style.display = 'block';
+            // Add autoplay parameter if not present
+            const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+            videoFrame.src = finalUrl;
+        }
+    }
 }
 
 window.closeVideoOverlay = function () {
     if (!videoOverlay) return;
     videoOverlay.classList.remove('active');
+
     setTimeout(() => {
-        videoFrame.src = ''; // Stop video
+        if (videoFrame) videoFrame.src = ''; // Stop iframe video
+        if (nativeVideo) {
+            nativeVideo.pause();
+            nativeVideo.src = ''; // Stop native video
+        }
     }, 300);
     document.body.style.overflow = ''; // Unlock scroll
 };
