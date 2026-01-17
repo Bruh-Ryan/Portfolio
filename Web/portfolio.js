@@ -133,34 +133,37 @@ function openVideo(url) {
         }
         if (nativeVideo) {
             nativeVideo.style.display = 'block';
-            nativeVideo.style.zIndex = '20'; // Force on top
+            nativeVideo.style.zIndex = '20';
 
-            // OPTIMIZATION: Use multiple source formats for maximum browser compatibility
-            // Clear any existing sources
+            // Clear existing sources
             nativeVideo.innerHTML = '';
             nativeVideo.removeAttribute('src');
-            //
 
-            // For Cloudinary videos, create multiple source formats
+            // For Cloudinary videos, provide multiple sources with proper transformations
             if (url.includes('cloudinary.com') && url.includes('/upload/')) {
-                // WebM source (Chrome/Firefox)
-                const sourceWebM = document.createElement('source');
-                sourceWebM.src = url.replace('/upload/', '/upload/f_auto:video,q_auto,vc_vp9/').replace(/\.(mp4|mov)$/i, '.webm');
-                sourceWebM.type = 'video/webm';
+                // Source 1: WebM with VP9 codec (best for Chrome/Firefox)
+                const source1 = document.createElement('source');
+                source1.src = url.replace('/upload/', '/upload/f_auto:video,q_auto:good,vc_vp9/');
+                source1.type = 'video/webm; codecs="vp9"';
 
-                // MP4 H.264 source (Safari/iOS)
-                const sourceMP4 = document.createElement('source');
-                sourceMP4.src = url.replace('/upload/', '/upload/f_auto:video,q_auto,vc_h264/').replace(/\.(webm|mov)$/i, '.mp4');
-                sourceMP4.type = 'video/mp4';
+                // Source 2: MP4 with H.264 codec (best for Safari/iOS)
+                const source2 = document.createElement('source');
+                source2.src = url.replace('/upload/', '/upload/f_auto:video,q_auto:good,vc_h264/');
+                source2.type = 'video/mp4; codecs="avc1.42E01E"';
 
-                nativeVideo.appendChild(sourceWebM);
-                nativeVideo.appendChild(sourceMP4);
+                // Source 3: Original as fallback
+                const source3 = document.createElement('source');
+                source3.src = url;
+                source3.type = 'video/mp4';
+
+                nativeVideo.appendChild(source1);
+                nativeVideo.appendChild(source2);
+                nativeVideo.appendChild(source3);
             } else {
-                // For non-Cloudinary URLs, use direct src
                 nativeVideo.src = url;
             }
 
-            nativeVideo.load(); // Reload with new sources
+            nativeVideo.load();
             nativeVideo.play().catch(e => console.log('Autoplay blocked:', e));
         }
     } else {
