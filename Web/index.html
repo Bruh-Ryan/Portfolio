@@ -277,14 +277,19 @@
                             style="font-family: var(--font-display); color: var(--color-highlight); text-shadow: 2px 2px 0 var(--color-dark-green); margin-bottom: 1rem; font-size: 1.8rem;">
                             Volley Beach</h2>
 
-                        <div class="game-thumbnail-container" onclick="window.open('https://muttonheadmaniac.itch.io/volleybeach', '_blank')">
+                        <div class="game-thumbnail-container"
+                            onclick="window.open('https://muttonheadmaniac.itch.io/volleybeach', '_blank')">
                             <!-- Updated path for nested structure -->
                             <img src="VolleyBeach/exports/VolleyBeach/VolleyBeach.png" alt="Volley Beach Game"
                                 class="game-thumb">
                         </div>
-                        <button class="retro-button play-game-btn" onclick="window.open('https://muttonheadmaniac.itch.io/volleybeach', '_blank')" style="margin-bottom: 0.5rem;">Play on itch.io!</button>
-                        <p style="font-size: 0.85rem; color: var(--color-dark-green); opacity: 0.9; margin-top: 0.5rem;">
-                            <a href="https://muttonheadmaniac.itch.io/volleybeach" target="_blank" style="color: var(--color-dark-green); text-decoration: underline;">
+                        <button class="retro-button play-game-btn"
+                            onclick="window.open('https://muttonheadmaniac.itch.io/volleybeach', '_blank')"
+                            style="margin-bottom: 0.5rem;">Play on itch.io!</button>
+                        <p
+                            style="font-size: 0.85rem; color: var(--color-dark-green); opacity: 0.9; margin-top: 0.5rem;">
+                            <a href="https://muttonheadmaniac.itch.io/volleybeach" target="_blank"
+                                style="color: var(--color-dark-green); text-decoration: underline;">
                                 View on itch.io →
                             </a>
                         </p>
@@ -435,11 +440,9 @@
         <div class="video-container">
             <button class="close-video" onclick="closeVideoOverlay()">✕</button>
             <div class="video-wrapper">
-                <!-- Native Video Tag for Cloudinary/MP4 -->
-                <video id="nativeVideo" controls playsinline style="display:none; width:100%; height:100%;"></video>
-                <!-- Existing Iframe for YouTube -->
-                <iframe id="videoFrame" src="" frameborder="0" allow="autoplay; encrypted-media"
-                    allowfullscreen></iframe>
+                <!-- Cloudinary Video Player Iframe -->
+                <iframe id="videoFrame" src="" frameborder="0" allow="autoplay; encrypted-media; fullscreen"
+                    allowfullscreen style="width:100%; height:100%;"></iframe>
                 <div style="position: absolute; z-index:-1;">Loading Video...</div>
             </div>
         </div>

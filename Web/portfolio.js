@@ -116,70 +116,35 @@ document.querySelector('.scroll-indicator')?.addEventListener('click', () => {
 // ========================================
 
 const videoOverlay = document.getElementById('videoOverlay');
-const nativeVideo = document.getElementById('nativeVideo');
+const videoFrame = document.getElementById('videoFrame');
 
 function openVideo(url) {
-    if (!videoOverlay) return;
+    if (!videoOverlay || !videoFrame) return;
 
     videoOverlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // Lock scroll
 
-    // Check if it's a direct video file (MP4)
-    if (url.toLowerCase().endsWith('.mp4') || url.toLowerCase().includes('cloudinary.com')) {
-        // Use Native Video Player
-        if (videoFrame) {
-            videoFrame.style.display = 'none';
-            videoFrame.src = '';
+    let embedUrl = url;
+
+    // Convert Cloudinary video URLs to player embed format
+    if (url.includes('cloudinary.com/') && url.includes('/video/upload/')) {
+        // Extract cloud name and public ID from the URL
+        const cloudNameMatch = url.match(/cloudinary\.com\/([^/]+)\//);
+        const publicIdMatch = url.match(/\/upload\/v\d+\/([^.]+)/);
+
+        if (cloudNameMatch && publicIdMatch) {
+            const cloudName = cloudNameMatch[1];
+            const publicId = publicIdMatch[1];
+            embedUrl = `https://player.cloudinary.com/embed/?cloud_name=${cloudName}&public_id=${publicId}&fluid=true&controls=true&autoplay=true`;
+            console.log('Cloudinary Embed URL:', embedUrl);
         }
-        if (nativeVideo) {
-            nativeVideo.style.display = 'block';
-            nativeVideo.style.zIndex = '20';
-
-            // Clear existing sources
-            nativeVideo.innerHTML = '';
-            nativeVideo.removeAttribute('src');
-
-            // For Cloudinary videos, provide multiple sources with proper transformations
-            if (url.includes('cloudinary.com') && url.includes('/upload/')) {
-                // Source 1: WebM with VP9 codec (best for Chrome/Firefox)
-                const source1 = document.createElement('source');
-                source1.src = url.replace('/upload/', '/upload/f_auto:video,q_auto:good,vc_vp9/');
-                source1.type = 'video/webm; codecs="vp9"';
-
-                // Source 2: MP4 with H.264 codec (best for Safari/iOS)
-                const source2 = document.createElement('source');
-                source2.src = url.replace('/upload/', '/upload/f_auto:video,q_auto:good,vc_h264/');
-                source2.type = 'video/mp4; codecs="avc1.42E01E"';
-                //hellow
-                // Source 3: Original as fallback
-                const source3 = document.createElement('source');
-                source3.src = url;
-                source3.type = 'video/mp4';
-
-                nativeVideo.appendChild(source1);
-                nativeVideo.appendChild(source2);
-                nativeVideo.appendChild(source3);
-            } else {
-                nativeVideo.src = url;
-            }
-
-            nativeVideo.load();
-            nativeVideo.play().catch(e => console.log('Autoplay blocked:', e));
-        }
-    } else {
-        // Use Iframe (YouTube/Vimeo)
-        if (nativeVideo) {
-            nativeVideo.style.display = 'none';
-            nativeVideo.pause();
-            nativeVideo.src = '';
-        }
-        if (videoFrame) {
-            videoFrame.style.display = 'block';
-            // Add autoplay parameter if not present
-            const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
-            videoFrame.src = finalUrl;
-        }
+    } else if (!url.includes('player.cloudinary.com') && !url.includes('youtube.com') && !url.includes('vimeo.com')) {
+        // For other video URLs, add autoplay if needed
+        embedUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
     }
+
+    videoFrame.src = embedUrl;
+    console.log('Opening video:', embedUrl);
 }
 
 window.closeVideoOverlay = function () {
@@ -187,11 +152,7 @@ window.closeVideoOverlay = function () {
     videoOverlay.classList.remove('active');
 
     setTimeout(() => {
-        if (videoFrame) videoFrame.src = ''; // Stop iframe video
-        if (nativeVideo) {
-            nativeVideo.pause();
-            nativeVideo.src = ''; // Stop native video
-        }
+        if (videoFrame) videoFrame.src = ''; // Stop video
     }, 300);
     document.body.style.overflow = ''; // Unlock scroll
 };
