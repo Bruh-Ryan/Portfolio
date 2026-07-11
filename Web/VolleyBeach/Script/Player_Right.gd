@@ -112,7 +112,7 @@ func _handle_ball_hit() -> void:
 	if hit_area == null:
 		return
 		
-	if Input.is_action_just_pressed("trigger_action_ball_?"):
+	if Input.is_action_just_pressed("trigger_action_ball_R"):
 		var balls = hit_area.get_overlapping_bodies()
 		
 		for body in balls:

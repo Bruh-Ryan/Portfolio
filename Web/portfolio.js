@@ -189,25 +189,29 @@ window.addEventListener('load', () => {
 
 const gameOverlay = document.getElementById('gameOverlay');
 const gameFrame = document.getElementById('gameFrame');
+let gameCloseTimer = null;
 
 window.openGame = function () {
     if (!gameOverlay || !gameFrame) return;
-    // Path to the game HTML. Corrected for nested structure.
+    if (gameCloseTimer) {
+        clearTimeout(gameCloseTimer);
+        gameCloseTimer = null;
+    }
     gameFrame.src = "VolleyBeach/exports/VolleyBeach/VolleyBeach.html";
     gameOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Lock scroll
-    console.log("Game Opened: VolleyBeach (Deep Path)");
+    document.body.style.overflow = 'hidden';
+    console.log("Game Opened: VolleyBeach");
 };
 
 window.closeGame = function () {
     if (!gameOverlay) return;
     gameOverlay.classList.remove('active');
 
-    // Clear src to stop game execution and audio
-    setTimeout(() => {
+    gameCloseTimer = setTimeout(() => {
         if (gameFrame) gameFrame.src = "";
+        gameCloseTimer = null;
     }, 300);
 
-    document.body.style.overflow = ''; // Unlock scroll
+    document.body.style.overflow = '';
     console.log("Game Closed");
 };

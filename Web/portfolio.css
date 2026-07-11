@@ -380,61 +380,10 @@ body {
     background-image: repeating-radial-gradient(circle at 0 0, transparent 0, transparent 20px, rgba(255, 255, 255, 0.2) 20px, rgba(255, 255, 255, 0.2) 22px);
 }
 
-/* 2. Tech */
-.abstract-tech {
-    background: #E8E4D0;
-    background-image: linear-gradient(var(--color-dark-green) 1px, transparent 1px),
-        linear-gradient(90deg, var(--color-dark-green) 1px, transparent 1px);
-    background-size: 20px 20px;
-    background-position: center;
-    opacity: 0.8;
-}
-
-/* 3. Project 1 (Book) - Orange Focus */
-.abstract-proj1 {
-    background: var(--color-highlight);
-    background-image: radial-gradient(#fff 15%, transparent 16%),
-        radial-gradient(#fff 15%, transparent 16%);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-    opacity: 0.7;
-}
-
-/* 4. Project 2 (API) - Dark Green Textured */
-.abstract-proj2 {
-    background: var(--color-dark-green);
-}
-
-.abstract-proj2::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(-45deg, transparent, transparent 5px, rgba(255, 255, 255, 0.1) 5px, rgba(255, 255, 255, 0.1) 10px);
-}
-
 /* 5. Project 3 (Real-Time) - Soft Vertical Lines */
 .abstract-proj3 {
     background: var(--color-soft-green);
     background-image: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255, 255, 255, 0.3) 20px, rgba(255, 255, 255, 0.3) 40px);
-}
-
-/* 6. Project 4 (Godot) - Pixel Art Grid */
-.abstract-godot {
-    background: var(--color-dark-green);
-    background-image:
-        linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 10px 10px;
-}
-
-.abstract-godot::after {
-    content: '👾';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    opacity: 0.5;
 }
 
 /* 7. Experiments - Lab Pattern */
@@ -451,21 +400,6 @@ body {
     border: 3px dashed var(--color-highlight);
     border-radius: 50%;
     animation: spin 20s linear infinite;
-}
-
-/* 8. Contact */
-.abstract-contact {
-    background: var(--color-cream);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.abstract-contact::before {
-    content: '✉';
-    font-size: 4rem;
-    color: var(--color-highlight);
-    opacity: 0.5;
 }
 
 @keyframes spin {
