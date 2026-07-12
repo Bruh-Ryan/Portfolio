@@ -218,33 +218,34 @@ function dispatchControllerInput(msg) {
   const mapping = keyMap[msg.action];
   if (!mapping) return;
 
-  const gameFrame = document.getElementById('gameFrame');
-  if (!gameFrame || !gameFrame.src) return;
+  const gOverlay = document.getElementById('gameOverlay');
+  if (!gOverlay || !gOverlay.classList.contains('active')) return;
 
-  const gameOverlay = document.getElementById('gameOverlay');
-  if (!gameOverlay || !gameOverlay.classList.contains('active')) return;
-
-  gameFrame.focus();
+  const gFrame = document.getElementById('gameFrame');
+  if (!gFrame || !gFrame.src) return;
 
   const eventType = msg.pressed ? 'keydown' : 'keyup';
+
+  // Send via postMessage to iframe — works cross-origin
+  gFrame.contentWindow.postMessage({
+    type: eventType,
+    key: mapping.key,
+    code: mapping.code,
+    keyCode: mapping.key.length === 1 ? mapping.key.toUpperCase().charCodeAt(0) : 0,
+    bubbles: true,
+    cancelable: true
+  }, '*');
+
+  // Also dispatch on parent document as fallback
   const keyboardEvent = new KeyboardEvent(eventType, {
     key: mapping.key,
     code: mapping.code,
+    keyCode: mapping.key.length === 1 ? mapping.key.toUpperCase().charCodeAt(0) : 0,
     bubbles: true,
     cancelable: true,
   });
-
   document.dispatchEvent(keyboardEvent);
   window.dispatchEvent(keyboardEvent);
-
-  try {
-    if (gameFrame.contentWindow)
-      gameFrame.contentWindow.dispatchEvent(keyboardEvent);
-    if (gameFrame.contentDocument)
-      gameFrame.contentDocument.dispatchEvent(keyboardEvent);
-  } catch(e) {
-    // cross-origin blocked — main document dispatch is the fallback
-  }
 }
 
 window.addEventListener('message', (event) => {

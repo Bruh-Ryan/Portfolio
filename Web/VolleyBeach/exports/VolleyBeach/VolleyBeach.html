@@ -215,6 +215,22 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 		</script>
+<script>
+window.addEventListener('message', function(e) {
+  const data = e.data;
+  if (!data || (data.type !== 'keydown' && data.type !== 'keyup')) return;
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+  const evt = new KeyboardEvent(data.type, {
+    key: data.key,
+    code: data.code,
+    bubbles: true,
+    cancelable: true
+  });
+  canvas.dispatchEvent(evt);
+  document.dispatchEvent(evt);
+});
+</script>
 	</body>
 </html>
 
