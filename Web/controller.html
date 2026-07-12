@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Game Controller</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #2F5A38;
+      font-family: 'VT323', monospace;
+      touch-action: none;
+      color: #fff;
+    }
+
+    #status-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: #1a1a2e;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 100;
+      gap: 8px;
+      border-bottom: 2px solid #DF6D14;
+    }
+
+    .status-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #999;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .status-dot.connected { background: #4caf50; box-shadow: 0 0 8px rgba(76, 175, 80, 0.6); }
+    .status-dot.disconnected { background: #f44336; box-shadow: 0 0 8px rgba(244, 67, 54, 0.6); }
+
+    #status-text {
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      color: #aaa;
+      flex: 1;
+    }
+
+    #player-badge {
+      background: #DF6D14;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    #connect-screen {
+      position: fixed;
+      top: 48px; left: 0; right: 0; bottom: 0;
+      background: #2F5A38;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #connect-screen h1 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.4rem;
+      color: #DF6D14;
+      margin-bottom: 12px;
+      text-shadow: 2px 2px 0 #1a1a2e;
+    }
+
+    #connect-screen p {
+      font-family: 'VT323', monospace;
+      font-size: 1.3rem;
+      color: #F8F5E9;
+      margin-bottom: 16px;
+    }
+
+    #connect-screen .error {
+      color: #f44336;
+    }
+
+    #connect-screen .room-code {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.5rem;
+      color: #DF6D14;
+      letter-spacing: 4px;
+      margin-top: 10px;
+      text-shadow: 2px 2px 0 #1a1a2e;
+    }
+
+    #controller {
+      position: fixed;
+      top: 48px; left: 0; right: 0; bottom: 0;
+      display: flex;
+      background: #2F5A38;
+    }
+
+    #controller.hidden { display: none; }
+    #controller:not(.hidden) { display: flex; }
+
+    .controller-left, .controller-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dpad {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dpad-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dpad-center {
+      width: 70px;
+      height: 70px;
+    }
+
+    .dpad-btn {
+      width: 70px;
+      height: 70px;
+      border: 3px solid #3A7D44;
+      border-radius: 12px;
+      background: #1a1a2e;
+      color: #F8F5E9;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      font-family: 'Press Start 2P', cursive;
+      transition: background 0.1s, transform 0.1s;
+    }
+
+    .dpad-btn.pressed {
+      background: #DF6D14;
+      border-color: #ff8c42;
+      transform: scale(0.92);
+    }
+
+    .face-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .face-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .face-btn {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      border: 3px solid #3A7D44;
+      background: #1a1a2e;
+      color: #F8F5E9;
+      font-size: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      font-family: 'Press Start 2P', cursive;
+      transition: background 0.1s, transform 0.1s;
+      line-height: 1.3;
+      padding: 4px;
+    }
+
+    .face-btn .face-label {
+      font-size: 0.5rem;
+      color: #F8F5E9;
+    }
+
+    .face-btn .face-key {
+      font-size: 0.45rem;
+      color: #9DC08B;
+      margin-top: 2px;
+    }
+
+    .face-btn.pressed { transform: scale(0.9); }
+    .face-btn[data-action="face_a"].pressed { background: #4caf50; border-color: #66bb6a; }
+    .face-btn[data-action="face_b"].pressed { background: #f44336; border-color: #ff6b81; }
+    .face-btn[data-action="face_x"].pressed { background: #2196f3; border-color: #64b5f6; }
+    .face-btn[data-action="face_y"].pressed { background: #ff9800; border-color: #ffb74d; }
+
+    @media (max-width: 400px) {
+      .dpad-btn { width: 60px; height: 60px; font-size: 1.2rem; }
+      .dpad-center { width: 60px; height: 60px; }
+      .face-btn { width: 65px; height: 65px; font-size: 0.5rem; }
+      .face-btn .face-label { font-size: 0.45rem; }
+      .face-btn .face-key { font-size: 0.4rem; }
+      #connect-screen h1 { font-size: 1.1rem; }
+      #player-badge { font-size: 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="status-bar">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="status-text">Initializing...</span>
+    <span id="player-badge">P1</span>
+  </div>
+
+  <div id="connect-screen">
+    <h1>Game Controller</h1>
+    <p id="connectMessage">Connecting to game...</p>
+    <div class="room-code" id="roomCodeDisplay"></div>
+  </div>
+
+  <div id="controller" class="hidden">
+    <div class="controller-left">
+      <div class="dpad">
+        <button class="dpad-btn" data-action="up">▲</button>
+        <div class="dpad-row">
+          <button class="dpad-btn" data-action="left">◀</button>
+          <div class="dpad-center"></div>
+          <button class="dpad-btn" data-action="right">▶</button>
+        </div>
+        <button class="dpad-btn" data-action="down">▼</button>
+      </div>
+    </div>
+    <div class="controller-right">
+      <div class="face-buttons">
+        <div class="face-row">
+          <button class="face-btn" data-action="face_x"><span class="face-label">X</span></button>
+          <button class="face-btn" data-action="face_y"><span class="face-label">Y</span></button>
+        </div>
+        <div class="face-row">
+          <button class="face-btn" data-action="face_a"><span class="face-label">SMASH</span><span class="face-key" id="faceAKey"></span></button>
+          <button class="face-btn" data-action="face_b"><span class="face-label">RESET</span><span class="face-key" id="faceBKey"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const room = urlParams.get('room');
+      const player = parseInt(urlParams.get('player')) || 1;
+
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('status-text');
+      const playerBadge = document.getElementById('player-badge');
+      const connectScreen = document.getElementById('connect-screen');
+      const controller = document.getElementById('controller');
+      const connectMessage = document.getElementById('connectMessage');
+      const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+
+      if (!room) {
+        connectMessage.textContent = 'Invalid QR code — scan again from the portfolio page';
+        connectMessage.className = 'error';
+        statusText.textContent = 'Error';
+        statusDot.className = 'status-dot disconnected';
+        return;
+      }
+
+      playerBadge.textContent = 'P' + player;
+      roomCodeDisplay.textContent = 'ROOM: ' + room;
+
+      const faceAKey = document.getElementById('faceAKey');
+      const faceBKey = document.getElementById('faceBKey');
+      if (player === 1) {
+        faceAKey.textContent = '[E]';
+        faceBKey.textContent = '[J]';
+      } else {
+        faceAKey.textContent = '[/]';
+        faceBKey.textContent = '[K]';
+      }
+
+      let peer = null;
+      let conn = null;
+      let reconnectAttempts = 0;
+      const MAX_RECONNECT = 5;
+
+      function connectToHost() {
+        if (reconnectAttempts >= MAX_RECONNECT) {
+          connectMessage.textContent = 'Could not connect after several attempts — scan the QR code again';
+          connectMessage.className = 'error';
+          statusText.textContent = 'Failed';
+          statusDot.className = 'status-dot disconnected';
+          return;
+        }
+
+        statusText.textContent = 'Connecting...';
+        statusDot.className = 'status-dot';
+
+        if (peer) peer.destroy();
+
+        peer = new Peer();
+
+        peer.on('open', () => {
+          connectMessage.textContent = 'Connecting to game...';
+          conn = peer.connect('vb-' + room, { reliable: true });
+
+          const connTimeout = setTimeout(() => {
+            if (conn && conn.open === false) {
+              conn.close();
+              connectMessage.textContent = 'Connection timed out — retrying...';
+              connectMessage.className = '';
+              reconnectAttempts++;
+              connectToHost();
+            }
+          }, 10000);
+
+          conn.on('open', () => {
+            clearTimeout(connTimeout);
+            reconnectAttempts = 0;
+            statusDot.className = 'status-dot connected';
+            statusText.textContent = 'Connected';
+            connectScreen.classList.add('hidden');
+            controller.classList.remove('hidden');
+          });
+
+          conn.on('close', () => {
+            statusDot.className = 'status-dot disconnected';
+            statusText.textContent = 'Disconnected';
+            connectScreen.classList.remove('hidden');
+            controller.classList.add('hidden');
+            connectMessage.textContent = 'Disconnected — attempting to reconnect...';
+            connectMessage.className = '';
+            reconnectAttempts++;
+            connectToHost();
+          });
+
+          conn.on('error', () => {
+            clearTimeout(connTimeout);
+            connectMessage.textContent = 'Connection error — retrying...';
+            connectMessage.className = '';
+            reconnectAttempts++;
+            connectToHost();
+          });
+        });
+
+        peer.on('error', (err) => {
+          if (err.type === 'peer-unavailable') {
+            connectMessage.textContent = 'Waiting for the portfolio page to open the controller panel...';
+            connectMessage.className = '';
+            setTimeout(() => {
+              reconnectAttempts++;
+              connectToHost();
+            }, 3000);
+          } else {
+            reconnectAttempts++;
+            setTimeout(() => connectToHost(), 2000);
+          }
+        });
+      }
+
+      connectToHost();
+
+      function sendInput(action, pressed) {
+        if (!conn || conn.open === false) return;
+        conn.send({
+          type: 'input',
+          action: action,
+          pressed: pressed,
+          player: player
+        });
+      }
+
+      const buttons = document.querySelectorAll('.dpad-btn, .face-btn');
+
+      document.addEventListener('touchmove', (e) => {
+        if (conn && conn.open) e.preventDefault();
+      }, { passive: false });
+
+      buttons.forEach(btn => {
+        btn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          const action = btn.dataset.action;
+          if (!btn.classList.contains('pressed')) {
+            btn.classList.add('pressed');
+            sendInput(action, true);
+          }
+        });
+
+        btn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          const action = btn.dataset.action;
+          if (btn.classList.contains('pressed')) {
+            btn.classList.remove('pressed');
+            sendInput(action, false);
+          }
+        });
+
+        btn.addEventListener('touchcancel', () => {
+          const action = btn.dataset.action;
+          if (btn.classList.contains('pressed')) {
+            btn.classList.remove('pressed');
+            sendInput(action, false);
+          }
+        });
+
+        btn.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          const action = btn.dataset.action;
+          if (!btn.classList.contains('pressed')) {
+            btn.classList.add('pressed');
+            sendInput(action, true);
+          }
+        });
+
+        btn.addEventListener('mouseup', (e) => {
+          e.preventDefault();
+          const action = btn.dataset.action;
+          if (btn.classList.contains('pressed')) {
+            btn.classList.remove('pressed');
+            sendInput(action, false);
+          }
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          const action = btn.dataset.action;
+          if (btn.classList.contains('pressed')) {
+            btn.classList.remove('pressed');
+            sendInput(action, false);
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -285,6 +285,10 @@
                         <button class="retro-button play-game-btn"
                             onclick="openGame()"
                             style="margin-bottom: 0.5rem;">Play Now!</button>
+                        <button class="retro-button controller-btn"
+                            onclick="openControllerPanel()"
+                            title="Allows to play using controller"
+                            style="margin-bottom: 0.5rem;">Mobile Controller</button>
                         <p
                             style="font-size: 0.85rem; color: var(--color-dark-green); opacity: 0.9; margin-top: 0.5rem;">
                             <a href="https://muttonheadmaniac.itch.io/volleybeach" target="_blank"
@@ -489,6 +493,38 @@
             (Close Game)</button>
     </div>
 
+    <!-- Controller Overlay -->
+    <div class="controller-overlay" id="controllerOverlay">
+        <div class="controller-panel">
+            <h2 class="controller-title">MOBILE CONTROLLER</h2>
+            <p class="controller-instructions">Scan a QR code with your phone to use it as a game controller</p>
+
+            <div class="qr-row">
+                <div class="qr-card">
+                    <div class="qr-label">P1 — WASD</div>
+                    <div class="qr-code" id="qrP1"></div>
+                    <div class="qr-url" id="qrUrlP1">Starting server...</div>
+                </div>
+                <div class="qr-card">
+                    <div class="qr-label">P2 — ARROWS</div>
+                    <div class="qr-code" id="qrP2"></div>
+                    <div class="qr-url" id="qrUrlP2">Starting server...</div>
+                </div>
+            </div>
+
+            <div class="controller-room-code">Room: <span id="roomCodeDisplay">------</span></div>
+
+            <div class="controller-status">
+                <span class="controller-status-dot" id="controllerStatusDot"></span>
+                <span class="controller-status-text" id="controllerStatusText">Initializing...</span>
+            </div>
+
+            <button class="retro-button close-controller-btn" type="button" onclick="closeControllerPanel()">Close</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="portfolio.js"></script>
 </body>
 

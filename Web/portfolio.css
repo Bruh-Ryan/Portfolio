@@ -858,3 +858,167 @@ ul li::before {
 .control-group.sys h4 {
     color: #f1c40f;
 }
+
+/* Controller Overlay */
+.controller-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.controller-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.controller-panel {
+    background: var(--color-cream);
+    border: 3px solid var(--color-dark-green);
+    padding: 2rem;
+    max-width: 700px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.controller-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.2rem;
+    color: var(--color-highlight);
+    margin-bottom: 0.75rem;
+    text-shadow: 2px 2px 0 var(--color-dark-green);
+}
+
+.controller-instructions {
+    font-family: var(--font-retro);
+    font-size: 1.1rem;
+    color: var(--color-dark-green);
+    margin-bottom: 1.5rem;
+    opacity: 0.85;
+}
+
+.qr-row {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.qr-card {
+    flex: 1;
+    max-width: 250px;
+    background: white;
+    border: 2px dashed var(--color-soft-green);
+    padding: 1rem;
+    text-align: center;
+}
+
+.qr-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    color: var(--color-dark-green);
+    margin-bottom: 0.75rem;
+}
+
+.qr-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    width: 200px;
+    height: 200px;
+    background: #fff;
+    border: 2px solid var(--color-dark-green);
+}
+
+.qr-code canvas {
+    display: block;
+    image-rendering: pixelated;
+}
+
+.qr-url {
+    font-family: var(--font-retro);
+    font-size: 0.8rem;
+    color: var(--color-highlight);
+    word-break: break-all;
+    margin-top: 0.25rem;
+}
+
+.controller-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-retro);
+    font-size: 1rem;
+    color: var(--color-dark-green);
+}
+
+.controller-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    background: #999;
+    transition: background 0.3s;
+}
+
+.controller-status-dot.connected {
+    background: #4caf50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+}
+
+.controller-status-dot.disconnected {
+    background: #f44336;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.6);
+}
+
+.controller-status-dot.idle {
+    background: #ff9800;
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.6);
+}
+
+.controller-room-code {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+    color: var(--color-highlight);
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 0 var(--color-dark-green);
+    letter-spacing: 2px;
+}
+
+.controller-room-code span {
+    color: var(--color-dark-green);
+    text-shadow: 2px 2px 0 var(--color-highlight);
+}
+
+.close-controller-btn {
+    background: var(--color-highlight) !important;
+    color: white !important;
+    border-color: var(--color-dark-green) !important;
+}
+
+@media (max-width: 600px) {
+    .qr-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .qr-card {
+        max-width: 220px;
+    }
+    .controller-title {
+        font-size: 0.9rem;
+    }
+}

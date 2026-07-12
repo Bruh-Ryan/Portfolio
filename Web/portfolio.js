@@ -184,8 +184,58 @@ window.addEventListener('load', () => {
 });
 
 // ========================================
-// 6. GAME OVERLAY LOGIC
+// 6. PHONE CONTROLLER (postMessage Bridge)
 // ========================================
+
+const KEY_MAP = {
+  1: {
+    up:     { key: 'w',         code: 'KeyW' },
+    left:   { key: 'a',         code: 'KeyA' },
+    right:  { key: 'd',         code: 'KeyD' },
+    down:   { key: 's',         code: 'KeyS' },
+    face_a: { key: 'e',         code: 'KeyE' },
+    face_b: { key: 'j',         code: 'KeyJ' },
+    face_x: { key: 'x',         code: 'KeyX' },
+    face_y: { key: 'y',         code: 'KeyY' },
+  },
+  2: {
+    up:     { key: 'ArrowUp',    code: 'ArrowUp' },
+    left:   { key: 'ArrowLeft',  code: 'ArrowLeft' },
+    right:  { key: 'ArrowRight', code: 'ArrowRight' },
+    down:   { key: 'ArrowDown',  code: 'ArrowDown' },
+    face_a: { key: '/',          code: 'Slash' },
+    face_b: { key: 'k',         code: 'KeyK' },
+    face_x: { key: 'x',         code: 'KeyX' },
+    face_y: { key: 'y',         code: 'KeyY' },
+  }
+};
+
+function dispatchControllerInput(msg) {
+  if (!msg || msg.type !== 'input') return;
+  const player = msg.player || 1;
+  const keyMap = KEY_MAP[player];
+  if (!keyMap) return;
+  const mapping = keyMap[msg.action];
+  if (!mapping) return;
+  const gameFrame = document.getElementById('gameFrame');
+  if (!gameFrame || !gameFrame.contentWindow) return;
+  const eventType = msg.pressed ? 'keydown' : 'keyup';
+  const keyboardEvent = new KeyboardEvent(eventType, {
+    key: mapping.key,
+    code: mapping.code,
+    bubbles: true,
+    cancelable: true,
+  });
+  gameFrame.contentWindow.dispatchEvent(keyboardEvent);
+  if (gameFrame.contentDocument) {
+    gameFrame.contentDocument.dispatchEvent(keyboardEvent);
+  }
+  console.log(`Controller: ${msg.action} ${msg.pressed ? 'pressed' : 'released'} (P${msg.player})`);
+}
+
+window.addEventListener('message', (event) => {
+  dispatchControllerInput(event.data);
+});
 
 const gameOverlay = document.getElementById('gameOverlay');
 const gameFrame = document.getElementById('gameFrame');
@@ -213,5 +263,160 @@ window.closeGame = function () {
     }, 300);
 
     document.body.style.overflow = '';
+    controllerCleanup();
     console.log("Game Closed");
+};
+
+// ========================================
+// 7. MOBILE CONTROLLER PANEL (PeerJS)
+// ========================================
+
+const controllerOverlay = document.getElementById('controllerOverlay');
+const controllerStatusDot = document.getElementById('controllerStatusDot');
+const controllerStatusText = document.getElementById('controllerStatusText');
+
+let controllerPeer = null;
+let controllerConn = null;
+let controllerQR1 = null;
+let controllerQR2 = null;
+let currentRoomCode = '';
+let inactivityInterval = null;
+let lastInputTime = 0;
+
+function generateRoomCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
+function setControllerStatus(state, text) {
+    controllerStatusDot.className = 'controller-status-dot';
+    if (state) controllerStatusDot.classList.add(state);
+    controllerStatusText.textContent = text;
+}
+
+function startInactivityTimer() {
+    stopInactivityTimer();
+    lastInputTime = Date.now();
+    inactivityInterval = setInterval(() => {
+        if (Date.now() - lastInputTime > 180000) {
+            setControllerStatus('idle', 'No activity — reconnect via QR');
+        }
+    }, 5000);
+}
+
+function stopInactivityTimer() {
+    if (inactivityInterval) {
+        clearInterval(inactivityInterval);
+        inactivityInterval = null;
+    }
+}
+
+function controllerCleanup() {
+    stopInactivityTimer();
+    if (controllerPeer) {
+        controllerPeer.destroy();
+        controllerPeer = null;
+    }
+    controllerConn = null;
+    currentRoomCode = '';
+    if (controllerConn) {
+        controllerConn = null;
+    }
+}
+
+window.openControllerPanel = function () {
+    if (!controllerOverlay) return;
+
+    controllerCleanup();
+
+    currentRoomCode = generateRoomCode();
+    const peerId = 'vb-' + currentRoomCode;
+    document.getElementById('roomCodeDisplay').textContent = currentRoomCode;
+
+    const baseUrl = window.location.origin;
+    const urlP1 = baseUrl + '/controller.html?room=' + currentRoomCode + '&player=1';
+    const urlP2 = baseUrl + '/controller.html?room=' + currentRoomCode + '&player=2';
+
+    document.getElementById('qrUrlP1').textContent = urlP1;
+    document.getElementById('qrUrlP2').textContent = urlP2;
+
+    if (typeof QRCode !== 'undefined') {
+        const el1 = document.getElementById('qrP1');
+        const el2 = document.getElementById('qrP2');
+        el1.innerHTML = '';
+        el2.innerHTML = '';
+        controllerQR1 = new QRCode(el1, {
+            text: urlP1, width: 200, height: 200,
+            colorDark: '#3A7D44', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        controllerQR2 = new QRCode(el2, {
+            text: urlP2, width: 200, height: 200,
+            colorDark: '#3A7D44', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    setControllerStatus('', 'Initializing...');
+
+    controllerPeer = new Peer(peerId);
+
+    controllerPeer.on('open', () => {
+        setControllerStatus('', 'Waiting for phone — scan a QR code above');
+        startInactivityTimer();
+        console.log('Controller peer ready: ' + peerId);
+    });
+
+    controllerPeer.on('connection', (conn) => {
+        controllerConn = conn;
+        const playerLabel = 'P' + (conn.metadata ? conn.metadata.player : '?');
+        setControllerStatus('connected', playerLabel + ' connected!');
+        lastInputTime = Date.now();
+        console.log('Phone connected: ' + playerLabel);
+
+        conn.on('data', (data) => {
+            if (data && data.type === 'input') {
+                lastInputTime = Date.now();
+                dispatchControllerInput(data);
+            }
+        });
+
+        conn.on('close', () => {
+            controllerConn = null;
+            setControllerStatus('disconnected', 'Phone disconnected — scan QR again');
+            console.log('Phone disconnected');
+        });
+    });
+
+    controllerPeer.on('error', (err) => {
+        console.error('Controller peer error:', err);
+        if (err.type === 'unavailable-id') {
+            setControllerStatus('disconnected', 'Room code taken — generating a new one');
+            setTimeout(() => openControllerPanel(), 500);
+        } else {
+            setControllerStatus('disconnected', 'Connection error — try again');
+        }
+    });
+
+    controllerOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    console.log("Controller Panel Opened");
+};
+
+window.closeControllerPanel = function () {
+    if (!controllerOverlay) return;
+    controllerOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+
+    if (controllerConn && controllerConn.open) {
+        setControllerStatus('connected', 'Phone connected');
+    } else if (controllerPeer && controllerPeer.open) {
+        setControllerStatus('', 'Waiting for phone');
+    }
+
+    console.log("Controller Panel Closed");
 };
