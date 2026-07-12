@@ -301,10 +301,38 @@
         faceBKey.textContent = '[K]';
       }
 
+      const peerConfig = {
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            {
+              urls: 'turn:openrelay.metered.ca:80',
+              username: 'openrelayproject',
+              credential: 'openrelayproject'
+            },
+            {
+              urls: 'turn:openrelay.metered.ca:443',
+              username: 'openrelayproject',
+              credential: 'openrelayproject'
+            },
+            {
+              urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+              username: 'openrelayproject',
+              credential: 'openrelayproject'
+            }
+          ]
+        }
+      };
+
       let peer = null;
       let conn = null;
       let reconnectAttempts = 0;
-      const MAX_RECONNECT = 5;
+      const MAX_RECONNECT = 10;
+
+      function backoffDelay() {
+        return Math.min(reconnectAttempts * 2000, 30000);
+      }
 
       function connectToHost() {
         if (reconnectAttempts >= MAX_RECONNECT) {
@@ -320,7 +348,7 @@
 
         if (peer) peer.destroy();
 
-        peer = new Peer();
+        peer = new Peer(peerConfig);
 
         peer.on('open', () => {
           connectMessage.textContent = 'Connecting to game...';
@@ -332,9 +360,9 @@
               connectMessage.textContent = 'Connection timed out — retrying...';
               connectMessage.className = '';
               reconnectAttempts++;
-              connectToHost();
+              setTimeout(() => connectToHost(), backoffDelay());
             }
-          }, 10000);
+          }, 30000);
 
           conn.on('open', () => {
             clearTimeout(connTimeout);
@@ -353,7 +381,7 @@
             connectMessage.textContent = 'Disconnected — attempting to reconnect...';
             connectMessage.className = '';
             reconnectAttempts++;
-            connectToHost();
+            setTimeout(() => connectToHost(), backoffDelay());
           });
 
           conn.on('error', () => {
@@ -361,7 +389,7 @@
             connectMessage.textContent = 'Connection error — retrying...';
             connectMessage.className = '';
             reconnectAttempts++;
-            connectToHost();
+            setTimeout(() => connectToHost(), backoffDelay());
           });
         });
 
@@ -369,13 +397,11 @@
           if (err.type === 'peer-unavailable') {
             connectMessage.textContent = 'Waiting for the portfolio page to open the controller panel...';
             connectMessage.className = '';
-            setTimeout(() => {
-              reconnectAttempts++;
-              connectToHost();
-            }, 3000);
+            reconnectAttempts++;
+            setTimeout(() => connectToHost(), backoffDelay());
           } else {
             reconnectAttempts++;
-            setTimeout(() => connectToHost(), 2000);
+            setTimeout(() => connectToHost(), backoffDelay());
           }
         });
       }

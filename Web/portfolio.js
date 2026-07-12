@@ -272,16 +272,41 @@ window.closeGame = function () {
 // ========================================
 
 const controllerOverlay = document.getElementById('controllerOverlay');
-const controllerStatusDot = document.getElementById('controllerStatusDot');
-const controllerStatusText = document.getElementById('controllerStatusText');
+
+const peerConfig = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      {
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      }
+    ]
+  }
+};
+
+const playerState = {
+  1: { conn: null, dot: document.getElementById('statusDotP1'), text: document.getElementById('statusTextP1'), lastInput: 0 },
+  2: { conn: null, dot: document.getElementById('statusDotP2'), text: document.getElementById('statusTextP2'), lastInput: 0 }
+};
 
 let controllerPeer = null;
-let controllerConn = null;
 let controllerQR1 = null;
 let controllerQR2 = null;
 let currentRoomCode = '';
 let inactivityInterval = null;
-let lastInputTime = 0;
 
 function generateRoomCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -292,19 +317,24 @@ function generateRoomCode() {
     return code;
 }
 
-function setControllerStatus(state, text) {
-    controllerStatusDot.className = 'controller-status-dot';
-    if (state) controllerStatusDot.classList.add(state);
-    controllerStatusText.textContent = text;
+function setPlayerStatus(player, state, text) {
+    const p = playerState[player];
+    if (!p) return;
+    p.dot.className = 'controller-status-dot';
+    if (state) p.dot.classList.add(state);
+    p.text.textContent = text;
 }
 
 function startInactivityTimer() {
     stopInactivityTimer();
-    lastInputTime = Date.now();
+    [1, 2].forEach(p => { playerState[p].lastInput = 0; });
     inactivityInterval = setInterval(() => {
-        if (Date.now() - lastInputTime > 180000) {
-            setControllerStatus('idle', 'No activity — reconnect via QR');
-        }
+        [1, 2].forEach(p => {
+            const ps = playerState[p];
+            if (ps.lastInput > 0 && Date.now() - ps.lastInput > 180000) {
+                setPlayerStatus(p, 'idle', 'P' + p + ' — no activity');
+            }
+        });
     }, 5000);
 }
 
@@ -321,11 +351,17 @@ function controllerCleanup() {
         controllerPeer.destroy();
         controllerPeer = null;
     }
-    controllerConn = null;
+    [1, 2].forEach(p => {
+        if (playerState[p].conn) {
+            playerState[p].conn.close();
+            playerState[p].conn = null;
+        }
+        playerState[p].lastInput = 0;
+        setPlayerStatus(p, '', 'P' + p + ' — Waiting...');
+    });
+    controllerQR1 = null;
+    controllerQR2 = null;
     currentRoomCode = '';
-    if (controllerConn) {
-        controllerConn = null;
-    }
 }
 
 window.openControllerPanel = function () {
@@ -361,44 +397,56 @@ window.openControllerPanel = function () {
         });
     }
 
-    setControllerStatus('', 'Initializing...');
+    [1, 2].forEach(p => setPlayerStatus(p, '', 'P' + p + ' — Initializing...'));
 
-    controllerPeer = new Peer(peerId);
+    controllerPeer = new Peer(peerId, peerConfig);
 
     controllerPeer.on('open', () => {
-        setControllerStatus('', 'Waiting for phone — scan a QR code above');
+        [1, 2].forEach(p => setPlayerStatus(p, '', 'P' + p + ' — Waiting...'));
         startInactivityTimer();
         console.log('Controller peer ready: ' + peerId);
     });
 
     controllerPeer.on('connection', (conn) => {
-        controllerConn = conn;
-        const playerLabel = 'P' + (conn.metadata ? conn.metadata.player : '?');
-        setControllerStatus('connected', playerLabel + ' connected!');
-        lastInputTime = Date.now();
-        console.log('Phone connected: ' + playerLabel);
+        let assignedPlayer = null;
 
         conn.on('data', (data) => {
             if (data && data.type === 'input') {
-                lastInputTime = Date.now();
+                const player = data.player || 1;
+                if (!assignedPlayer) {
+                    assignedPlayer = player;
+                    if (playerState[player].conn && playerState[player].conn !== conn) {
+                        playerState[player].conn.close();
+                    }
+                    playerState[player].conn = conn;
+                    setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
+                    console.log('Phone connected: P' + player);
+                }
+                playerState[player].lastInput = Date.now();
                 dispatchControllerInput(data);
             }
         });
 
         conn.on('close', () => {
-            controllerConn = null;
-            setControllerStatus('disconnected', 'Phone disconnected — scan QR again');
-            console.log('Phone disconnected');
+            if (assignedPlayer && playerState[assignedPlayer]) {
+                playerState[assignedPlayer].conn = null;
+                setPlayerStatus(assignedPlayer, 'disconnected', 'P' + assignedPlayer + ' disconnected');
+                console.log('Phone disconnected: P' + assignedPlayer);
+            }
+        });
+
+        conn.on('error', () => {
+            if (assignedPlayer && playerState[assignedPlayer]) {
+                playerState[assignedPlayer].conn = null;
+            }
         });
     });
 
     controllerPeer.on('error', (err) => {
         console.error('Controller peer error:', err);
         if (err.type === 'unavailable-id') {
-            setControllerStatus('disconnected', 'Room code taken — generating a new one');
+            [1, 2].forEach(p => setPlayerStatus(p, 'disconnected', 'Room taken — retrying...'));
             setTimeout(() => openControllerPanel(), 500);
-        } else {
-            setControllerStatus('disconnected', 'Connection error — try again');
         }
     });
 
@@ -412,11 +460,14 @@ window.closeControllerPanel = function () {
     controllerOverlay.classList.remove('active');
     document.body.style.overflow = '';
 
-    if (controllerConn && controllerConn.open) {
-        setControllerStatus('connected', 'Phone connected');
-    } else if (controllerPeer && controllerPeer.open) {
-        setControllerStatus('', 'Waiting for phone');
-    }
+    [1, 2].forEach(p => {
+        const ps = playerState[p];
+        if (ps.conn && ps.conn.open) {
+            setPlayerStatus(p, 'connected', 'P' + p + ' connected');
+        } else {
+            setPlayerStatus(p, '', 'P' + p + ' — Waiting...');
+        }
+    });
 
     console.log("Controller Panel Closed");
 };
