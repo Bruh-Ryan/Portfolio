@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://byahkosi1ietr"]
+
+[ext_resource type="Script" uid="uid://cp7wpqyv4eryg" path="res://Script/result_board.gd" id="1_gdhqf"]
+[ext_resource type="Script" uid="uid://biy45bxgsdeem" path="res://Script/score_display.gd" id="1_qmfq8"]
+
+[node name="ResultBoard" type="Control" unique_id=1974024190]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -10.0
+offset_top = 4.0
+offset_right = 30.0
+offset_bottom = 44.0
+script = ExtResource("1_gdhqf")
+
+[node name="Restart_Button" type="Button" parent="." unique_id=1429732790]
+layout_mode = 0
+offset_left = 830.0
+offset_top = 753.0001
+offset_right = 838.0
+offset_bottom = 761.0001
+scale = Vector2(4.5999985, 5.9999986)
+text = "Restart
+"
+script = ExtResource("1_qmfq8")
+
+[node name="Label" type="Label" parent="." unique_id=960096269]
+layout_mode = 0
+offset_left = 503.00006
+offset_top = -5.0000305
+offset_right = 551.00006
+offset_bottom = 17.99997
+scale = Vector2(18.839998, 14.599998)
+text = "Score:"

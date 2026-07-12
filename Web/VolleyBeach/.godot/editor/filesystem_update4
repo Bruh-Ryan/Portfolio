@@ -1,0 +1,8 @@
+res://Scenes/Game.tscn
+res://Script/score_display.gd
+res://Scenes/game.gd
+res://Script/Player_Left.gd
+res://Scenes/result_board.tscn
+res://Script/result_board.gd
+res://Script/menu.gd
+res://Scenes/menu.tscn

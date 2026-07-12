@@ -9,9 +9,10 @@ enum States { IDLE, JUMPING }
 var state: States = States.IDLE
 var ground_y_position: float = 0.0  # Store ground level
 
+
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hit_area: Area2D = $Hit_area
-@onready var spawn_marker: Marker2D = $Spawn_Marker
+@onready var spawn_marker: Marker2D = $Spawn_Marker2D
 
 # Hit settings
 const SPIKE_FORCE := 600.0
@@ -70,15 +71,10 @@ func _handle_passive_ball_push():
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
-		
-		# Check if colliding with ball
 		if collider is RigidBody2D and collider.name == "Ball":
-			# Get which collision shape on the player was hit
 			var local_shape = collision.get_local_shape()
-			
-			# Only push if ball hit the "Head" collision shape
-			if local_shape != null and local_shape.get_parent().name == "Head":
-				var push_direction = Vector2(0, -1)  # Straight up
+			if local_shape != null and local_shape.get_parent() != null and local_shape.get_parent().name == "Head":
+				var push_direction = Vector2(0, -1)
 				collider.apply_central_impulse(push_direction * PASSIVE_PUSH_FORCE)
 
 func _spawn_ball() -> void:

@@ -11,7 +11,7 @@ var ground_y_position: float = 0.0  # Store ground level
 ##doesnt work gotta do this diffrent way, like layers use
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hit_area: Area2D = $Hit_area
-@onready var spawn_marker: Marker2D = $Spawn_Marker
+@onready var spawn_marker: Marker2D = $Spawn_Marker2D
 
 # Hit settings
 const SPIKE_FORCE := 600.0

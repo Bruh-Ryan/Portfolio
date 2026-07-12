@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://cub6seg3sf8te"]
+
+[ext_resource type="Script" uid="uid://vu3ji5dgsuvq" path="res://Script/menu.gd" id="1_1rerr"]
+
+[node name="Menu" type="Control" unique_id=287638590]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -1088.0
+offset_top = -1190.0
+offset_right = -1048.0
+offset_bottom = -1150.0
+scale = Vector2(42.511562, 23.412573)
+script = ExtResource("1_1rerr")
+
+[node name="Start" type="Button" parent="." unique_id=2140878626]
+layout_mode = 0
+offset_left = 35.966686
+offset_top = 56.422676
+offset_right = 81.96669
+offset_bottom = 87.422676
+scale = Vector2(0.47183955, 0.25847378)
+text = "Start"
+
+[node name="Options" type="Button" parent="." unique_id=825303583]
+layout_mode = 0
+offset_left = 36.269947
+offset_top = 70.37616
+offset_right = 106.26994
+offset_bottom = 101.37616
+scale = Vector2(0.30035716, 0.32316297)
+text = "Options"
+
+[node name="Quit" type="Button" parent="." unique_id=1348843886]
+layout_mode = 0
+offset_left = 35.969257
+offset_top = 84.911644
+offset_right = 77.96926
+offset_bottom = 115.911644
+scale = Vector2(0.5129932, 0.26988184)
+text = "Quit"
+
+[connection signal="pressed" from="Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="Options" to="." method="_on_options_pressed"]
+[connection signal="pressed" from="Quit" to="." method="_on_quit_pressed"]
