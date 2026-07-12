@@ -5,6 +5,8 @@ extends Node2D
 @onready var ball  = $Ball
 
 func _ready() -> void:
+	$ScoreLeft.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$ScoreRight.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ScoreManager.ball_node = ball
 	ScoreManager.net_x     = $Ball_net.global_position.x
 	ScoreManager.ground_y  = $Bottom_Ground.global_position.y

@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://byahkosi1ietr"]
 
 [ext_resource type="Script" uid="uid://cp7wpqyv4eryg" path="res://Script/result_board.gd" id="1_gdhqf"]
-[ext_resource type="Script" uid="uid://biy45bxgsdeem" path="res://Script/score_display.gd" id="1_qmfq8"]
 
 [node name="ResultBoard" type="Control" unique_id=1974024190]
 layout_mode = 3
@@ -21,7 +20,6 @@ offset_bottom = 761.0001
 scale = Vector2(4.5999985, 5.9999986)
 text = "Restart
 "
-script = ExtResource("1_qmfq8")
 
 [node name="Label" type="Label" parent="." unique_id=960096269]
 layout_mode = 0

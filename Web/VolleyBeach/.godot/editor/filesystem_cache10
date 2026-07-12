@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1783869372
+::res://::1783896952
 ball.gd::GDScript::5045108844539358557::1783758488::0::1::::<>RigidBody2D<><>0<>0<><>::
 export_presets.cfg::TextFile::-1::1783759869::0::1::::<><><>0<>0<><>::
 icon.svg::CompressedTexture2D::3494804292800372694::1783758488::1783759915::1::::<><><>0<>0<>e1e7c4740c0263ef38a645ba09828a2e<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
@@ -7,20 +7,23 @@ icon.svg::CompressedTexture2D::3494804292800372694::1783758488::1783759915::1:::
 ::res://exports/VolleyBeach/::1783760107
 VolleyBeach.apple-touch-icon.png::CompressedTexture2D::3123270340441033913::1783758488::1783759915::1::::<><><>0<>0<>86f60dc232b158496444569e0a654b68<>res://.godot/imported/VolleyBeach.apple-touch-icon.png-19fbf6d0b7e725713b95bf1daf1ba67c.ctex::
 VolleyBeach.png::CompressedTexture2D::6297735455898749503::1783758488::1783759915::1::::<><><>0<>0<>aa58b5a06dacf15f39935045503ceaf0<>res://.godot/imported/VolleyBeach.png-9c92f710d4a42c80a66069dceeab09c9.ctex::
-::res://Scenes/::1783863910
+::res://Scenes/::1783896532
 Ball.tscn::PackedScene::2490204951429379479::1783758488::0::1::::<><><>0<>0<><>::uid://sj7fg0f5m6lx::::res://Sprites/VolleyBall.png
-game.gd::GDScript::2493474041163368466::1783863157::0::1::::<>Node2D<><>0<>0<><>::
-Game.tscn::PackedScene::137854242063965336::1783863910::0::1::::<><><>0<>0<><>::uid://bbr4fhbxafaf7::::res://Scenes/game.gd<>uid://dlhvu7kq1tju1::::res://Sprites/Beach.png<>uid://ky734wjre1ge::::res://Scenes/Player1.tscn<>uid://dqr5ph4xskws6::::res://Scenes/Player2.tscn<>uid://bbqjkumdn0v7l::::res://Scenes/Ball.tscn<>uid://6y6ohqx162fj::::res://Scenes/Volleyball_net.tscn<>uid://go3pr1dsbjpg::::res://Scenes/multi_cam.gd<>uid://biy45bxgsdeem::::res://Script/score_display.gd<>uid://byahkosi1ietr::::res://Scenes/result_board.tscn
+game.gd::GDScript::2493474041163368466::1783896532::0::1::::<>Node2D<><>0<>0<><>::
+Game.tscn::PackedScene::137854242063965336::1783896057::0::1::::<><><>0<>0<><>::uid://bbr4fhbxafaf7::::res://Scenes/game.gd<>uid://dlhvu7kq1tju1::::res://Sprites/Beach.png<>uid://ky734wjre1ge::::res://Scenes/Player1.tscn<>uid://dqr5ph4xskws6::::res://Scenes/Player2.tscn<>uid://bbqjkumdn0v7l::::res://Scenes/Ball.tscn<>uid://6y6ohqx162fj::::res://Scenes/Volleyball_net.tscn<>uid://go3pr1dsbjpg::::res://Scenes/multi_cam.gd<>uid://biy45bxgsdeem::::res://Script/score_display.gd
+menu.tscn::PackedScene::6180597209625666390::1783895725::0::1::::<><><>0<>0<><>::uid://vu3ji5dgsuvq::::res://Script/menu.gd
 multi_cam.gd::GDScript::451762146313343408::1783758488::0::1::::<>Camera2D<><>0<>0<><>::
 Player1.tscn::PackedScene::753428006070297736::1783758488::0::1::::<><><>0<>0<><>::uid://baa3nnjt8rtm4::::res://Script/Player_Right.gd<>uid://uhng6l55afio::::res://Sprites/Player.png
 Player2.tscn::PackedScene::8319226681330671851::1783758488::0::1::::<><><>0<>0<><>::uid://dt4qn0cackdol::::res://Script/Player_Left.gd<>uid://uhng6l55afio::::res://Sprites/Player.png
-result_board.tscn::PackedScene::4071396571426221831::1783862887::0::1::::<><><>0<>0<><>::uid://biy45bxgsdeem::::res://Script/score_display.gd
+result_board.tscn::PackedScene::4071396571426221831::1783896532::0::1::::<><><>0<>0<><>::uid://cp7wpqyv4eryg::::res://Script/result_board.gd
 score_system.tscn::PackedScene::7307554363322722656::1783758488::0::1::::<><><>0<>0<><>::uid://d18ynmcc5bxc1::::res://Sprites/numbers/0.png<>uid://djgj4vjhd7q73::::res://Sprites/numbers/1.png<>uid://my4elbs3f16g::::res://Sprites/numbers/2.png<>uid://b1yxts4jgv6pt::::res://Sprites/numbers/3.png<>uid://stlfirl3b535::::res://Sprites/numbers/4.png<>uid://cwl144vqedpbv::::res://Sprites/numbers/5.png<>uid://cst6wao4n0pnk::::res://Sprites/numbers/6.png<>uid://bgrelrbeje7w3::::res://Sprites/numbers/7.png<>uid://ct21lfpfr0x4x::::res://Sprites/numbers/8.png<>uid://bdsc4r57g6tk2::::res://Sprites/numbers/9.png
 Volleyball_net.tscn::PackedScene::2227306840228198423::1783758488::0::1::::<><><>0<>0<><>::uid://dh133gafpbiqn::::res://Sprites/VolleyBall net.png
-::res://Script/::1783863780
-Player_Left.gd::GDScript::8553713038451111139::1783758488::0::1::::<>CharacterBody2D<><>0<>0<><>::
+::res://Script/::1783896181
+menu.gd::GDScript::1516969886098469882::1783895638::0::1::::<>Control<><>0<>0<><>::
+Player_Left.gd::GDScript::8553713038451111139::1783896181::0::1::::<>CharacterBody2D<><>0<>0<><>::
 Player_Right.gd::GDScript::2388144672426180025::1783863780::0::1::::<>CharacterBody2D<><>0<>0<><>::
-score_display.gd::GDScript::2999290953852810076::1783863078::0::1::::<>Control<><>0<>0<><>::
+result_board.gd::GDScript::5893097549278019978::1783895053::0::1::::<>Control<><>0<>0<><>::
+score_display.gd::GDScript::2999290953852810076::1783894274::0::1::::<>Control<><>0<>0<><>::
 score_manager.gd::GDScript::2876506773084904091::1783856735::0::1::::<>Node<><>0<>0<><>::
 ::res://Sprites/::1783856440
 Beach.png::CompressedTexture2D::7947102445059989662::1783760090::1783856440::1::::<><><>0<>0<>1cabd1e275c84ceff1f17ec798e91846<>res://.godot/imported/Beach.png-5ee60dc5c651845d4319448b4952b19d.ctex::
