@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="ably-key" content="X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y">
   <title>Game Controller</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
   <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
@@ -326,7 +327,8 @@
         faceBKey.textContent = '[K]';
       }
 
-      const ably = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
+      const ablyKey = document.querySelector('meta[name="ably-key"]').content;
+      const ably = new Ably.Realtime({ key: ablyKey });
       const channel = ably.channels.get('vb-' + room);
       dbg('Ably state: ' + ably.connection.state);
       channel.attach((err) => {

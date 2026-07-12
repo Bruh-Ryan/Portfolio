@@ -345,6 +345,23 @@ function controllerCleanup() {
     currentRoomCode = '';
 }
 
+function setupAblyChannel() {
+    ablyChannel = ablyClient.channels.get('vb-' + currentRoomCode);
+    ablyChannel.subscribe('input', (msg) => {
+        console.log('[ABLY] Message received on desktop:', msg.data);
+        const data = msg.data;
+        if (data.type === 'ping') return;
+        const player = data.player || 1;
+        playerState[player].lastInput = Date.now();
+        setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
+        stopInactivityTimer();
+        startInactivityTimer();
+        dispatchControllerInput(data);
+    });
+    ablyChannel.publish('input', { type: 'ping', player: 0 });
+    console.log('[ABLY] Subscribed and ready on channel vb-' + currentRoomCode);
+}
+
 window.openControllerPanel = function () {
     if (!controllerOverlay) return;
 
@@ -379,25 +396,24 @@ window.openControllerPanel = function () {
 
     [1, 2].forEach(p => setPlayerStatus(p, '', 'P' + p + ' — Initializing...'));
 
-    ablyClient = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
+    const ablyKey = document.querySelector('meta[name="ably-key"]').content;
+    ablyClient = new Ably.Realtime({ key: ablyKey });
 
-    ablyClient.connection.once('connected', () => {
-        console.log('[ABLY] Desktop connected to Ably');
-        ablyChannel = ablyClient.channels.get('vb-' + currentRoomCode);
-        ablyChannel.subscribe('input', (msg) => {
-            console.log('[ABLY] Message received on desktop:', msg.data);
-            const data = msg.data;
-            if (data.type === 'ping') return;
-            const player = data.player || 1;
-            playerState[player].lastInput = Date.now();
-            setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
-            stopInactivityTimer();
-            startInactivityTimer();
-            dispatchControllerInput(data);
-        });
-        ablyChannel.publish('input', { type: 'ping', player: 0 });
-        console.log('[ABLY] Subscribed to channel vb-' + currentRoomCode);
+    ablyClient.connection.on('failed', (err) => {
+        console.log('[ABLY] Connection FAILED:', err);
     });
+    ablyClient.connection.on('disconnected', () => {
+        console.log('[ABLY] Connection disconnected');
+    });
+    if (ablyClient.connection.state === 'connected') {
+        console.log('[ABLY] Already connected — setting up channel');
+        setupAblyChannel();
+    } else {
+        ablyClient.connection.once('connected', () => {
+            console.log('[ABLY] Desktop connected to Ably');
+            setupAblyChannel();
+        });
+    }
 
     controllerOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
