@@ -267,36 +267,14 @@
     </div>
   </div>
 
-  <div id="debug-log" style="
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: rgba(0,0,0,0.85);
-    color: #0f0;
-    font-family: monospace;
-    font-size: 11px;
-    padding: 8px;
-    z-index: 9999;
-    border-top: 2px solid #DF6D14;
-  "></div>
+
 
   <script>
     (function() {
-      function dbg(msg) {
-        const log = document.getElementById('debug-log');
-        if (!log) return;
-        const line = document.createElement('div');
-        line.textContent = new Date().toISOString().slice(11,19) + ' ' + msg;
-        log.appendChild(line);
-        log.scrollTop = log.scrollHeight;
-        console.log(msg);
-      }
-
       const urlParams = new URLSearchParams(window.location.search);
       const room = urlParams.get('room');
       const player = parseInt(urlParams.get('player')) || 1;
-      dbg('Page loaded, room=' + room + ' player=' + player);
+      console.log('Page loaded, room=' + room + ' player=' + player);
 
       const statusDot = document.getElementById('statusDot');
       const statusText = document.getElementById('status-text');
@@ -328,16 +306,16 @@
       }
 
       const ably = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
-      dbg('Ably key loaded: ' + (ably.options?.key ? 'yes' : 'NO KEY'));
+      console.log('Ably key loaded: ' + (ably.options?.key ? 'yes' : 'NO KEY'));
       const channel = ably.channels.get('vb-' + room);
-      dbg('Ably state: ' + ably.connection.state);
+      console.log('Ably state: ' + ably.connection.state);
       channel.attach((err) => {
-        if (err) dbg('Channel attach ERROR: ' + err.message);
-        else dbg('Channel attached OK');
+        if (err) console.log('Channel attach ERROR: ' + err.message);
+        else console.log('Channel attached OK');
       });
 
       ably.connection.on('connected', () => {
-        dbg('Connection event fired — showing controller UI');
+        console.log('Connection event fired — showing controller UI');
         statusDot.className = 'status-dot connected';
         statusText.textContent = 'Connected';
         connectScreen.style.display = 'none';
@@ -345,7 +323,7 @@
       });
 
       ably.connection.on('disconnected', () => {
-        dbg('[ABLY] Disconnected');
+        console.log('[ABLY] Disconnected');
         statusDot.className = 'status-dot disconnected';
         statusText.textContent = 'Disconnected';
         connectScreen.style.display = 'flex';
@@ -355,11 +333,11 @@
 
       function sendInput(action, pressed) {
         const payload = { type: 'input', action, pressed, player };
-        dbg('Publishing: ' + JSON.stringify(payload));
+        console.log('Publishing: ' + JSON.stringify(payload));
         channel.publish('input', payload).then(() => {
-          dbg('Publish OK');
+          console.log('Publish OK');
         }).catch((err) => {
-          dbg('Publish FAILED: ' + err.message);
+          console.log('Publish FAILED: ' + err.message);
         });
       }
 

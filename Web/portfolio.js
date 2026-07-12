@@ -211,28 +211,16 @@ const KEY_MAP = {
 };
 
 function dispatchControllerInput(msg) {
-  console.log('[DISPATCH] called with:', msg);
-  if (!msg || msg.type !== 'input') {
-    console.log('[DISPATCH] early return — invalid msg, type was:', msg?.type);
-    return;
-  }
+  if (!msg || msg.type !== 'input') return;
   const player = msg.player || 1;
   const keyMap = KEY_MAP[player];
-  if (!keyMap) {
-    console.log('[DISPATCH] early return — no keyMap for player:', player);
-    return;
-  }
+  if (!keyMap) return;
   const mapping = keyMap[msg.action];
-  if (!mapping) {
-    console.log('[DISPATCH] early return — no mapping for action:', msg.action, 'player:', player);
-    return;
-  }
-  console.log('[DISPATCH] player:', player, 'action:', msg.action, '→ mapping:', mapping);
+  if (!mapping) return;
+
   const gameFrame = document.getElementById('gameFrame');
-  console.log('[DISPATCH] gameFrame:', gameFrame);
-  console.log('[DISPATCH] gameFrame.src:', gameFrame?.src);
-  console.log('[DISPATCH] gameFrame.contentWindow:', gameFrame?.contentWindow);
-  if (!gameFrame || !gameFrame.contentWindow) { console.log('[DISPATCH] early return — no gameFrame or contentWindow'); return; }
+  if (!gameFrame || !gameFrame.src) return;
+
   const eventType = msg.pressed ? 'keydown' : 'keyup';
   const keyboardEvent = new KeyboardEvent(eventType, {
     key: mapping.key,
@@ -240,12 +228,17 @@ function dispatchControllerInput(msg) {
     bubbles: true,
     cancelable: true,
   });
-  console.log('[DISPATCH] dispatching', eventType, 'key:', mapping.key, 'code:', mapping.code);
-  gameFrame.contentWindow.dispatchEvent(keyboardEvent);
-  console.log('[DISPATCH] dispatched to contentWindow');
-  if (gameFrame.contentDocument) {
-    gameFrame.contentDocument.dispatchEvent(keyboardEvent);
-    console.log('[DISPATCH] dispatched to contentDocument');
+
+  document.dispatchEvent(keyboardEvent);
+  window.dispatchEvent(keyboardEvent);
+
+  try {
+    if (gameFrame.contentWindow)
+      gameFrame.contentWindow.dispatchEvent(keyboardEvent);
+    if (gameFrame.contentDocument)
+      gameFrame.contentDocument.dispatchEvent(keyboardEvent);
+  } catch(e) {
+    // cross-origin blocked — main document dispatch is the fallback
   }
 }
 
