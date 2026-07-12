@@ -382,29 +382,22 @@ window.openControllerPanel = function () {
     ablyClient = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
 
     ablyClient.connection.once('connected', () => {
-        [1, 2].forEach(p => setPlayerStatus(p, '', 'P' + p + ' — Waiting...'));
-        startInactivityTimer();
-        console.log('Ably connected: vb-' + currentRoomCode);
-    });
-
-    ablyChannel = ablyClient.channels.get('vb-' + currentRoomCode);
-
-    ablyChannel.subscribe('input', (msg) => {
-        console.log('[ABLY] Message received on desktop:', msg.data);
-        const data = msg.data;
-        if (data && data.type === 'input') {
+        console.log('[ABLY] Desktop connected to Ably');
+        ablyChannel = ablyClient.channels.get('vb-' + currentRoomCode);
+        ablyChannel.subscribe('input', (msg) => {
+            console.log('[ABLY] Message received on desktop:', msg.data);
+            const data = msg.data;
+            if (data.type === 'ping') return;
             const player = data.player || 1;
-            if (playerState[player]) {
-                playerState[player].lastInput = Date.now();
-                setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
-            }
+            playerState[player].lastInput = Date.now();
+            setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
+            stopInactivityTimer();
+            startInactivityTimer();
             dispatchControllerInput(data);
-        }
+        });
+        ablyChannel.publish('input', { type: 'ping', player: 0 });
+        console.log('[ABLY] Subscribed to channel vb-' + currentRoomCode);
     });
-
-    // Test: publish a ping and see if it comes back
-    ablyChannel.publish('input', { type: 'ping', player: 0 });
-    console.log('[ABLY] Test ping published to channel vb-' + currentRoomCode);
 
     controllerOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
