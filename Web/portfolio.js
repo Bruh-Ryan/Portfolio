@@ -212,12 +212,21 @@ const KEY_MAP = {
 
 function dispatchControllerInput(msg) {
   console.log('[DISPATCH] called with:', msg);
-  if (!msg || msg.type !== 'input') { console.log('[DISPATCH] early return — invalid msg'); return; }
+  if (!msg || msg.type !== 'input') {
+    console.log('[DISPATCH] early return — invalid msg, type was:', msg?.type);
+    return;
+  }
   const player = msg.player || 1;
   const keyMap = KEY_MAP[player];
-  if (!keyMap) { console.log('[DISPATCH] early return — no keyMap for player', player); return; }
+  if (!keyMap) {
+    console.log('[DISPATCH] early return — no keyMap for player:', player);
+    return;
+  }
   const mapping = keyMap[msg.action];
-  if (!mapping) { console.log('[DISPATCH] early return — no mapping for action', msg.action); return; }
+  if (!mapping) {
+    console.log('[DISPATCH] early return — no mapping for action:', msg.action, 'player:', player);
+    return;
+  }
   console.log('[DISPATCH] player:', player, 'action:', msg.action, '→ mapping:', mapping);
   const gameFrame = document.getElementById('gameFrame');
   console.log('[DISPATCH] gameFrame:', gameFrame);
