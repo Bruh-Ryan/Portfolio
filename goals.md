@@ -42,4 +42,38 @@
 - [ ] Full P2 smash implementation (not just action name fix)
 - [ ] Add proper menu scene
 - [ ] Add audio/sound effects
-- [ ] Mobile touch controls for the web build
+
+---
+
+## Phase 3 — Phone Controller (Local WiFi) ✅
+
+### Server (`server/`)
+- [x] Node.js server with Express + WebSocket
+- [x] Auto-detects local IP address
+- [x] QR code generation for phone discovery
+- [x] Serves controller web app and bridge page
+
+### Controller Web App (`server/public/controller/`)
+- [x] Touch d-pad (Up, Down, Left, Right) on left side
+- [x] 4 face buttons (A, B, X, Y) on right side
+- [x] Multi-touch support (multiple simultaneous button presses)
+- [x] WebSocket client for real-time input relay
+- [x] Player selection (P1/P2 toggle)
+- [x] Connection status indicator
+
+### Bridge Page (`server/public/bridge/`)
+- [x] Opens Vercel portfolio in a popup window
+- [x] Connects to local WebSocket server
+- [x] Relays phone inputs to portfolio via postMessage
+
+### Portfolio Integration (`Web/portfolio.js`)
+- [x] Listens for postMessage events from bridge
+- [x] Dispatches KeyboardEvent into game iframe
+- [x] Maps controller buttons to game keys (P1: WASD+E/J, P2: Arrows+//K)
+
+### How to Use
+1. Run `node server.js` in the `server/` directory
+2. Open `http://localhost:3000` on your computer
+3. Scan the QR code with your phone → opens the controller
+4. Click "Open Game & Connect" on the bridge page
+5. Tap buttons on your phone to control the game

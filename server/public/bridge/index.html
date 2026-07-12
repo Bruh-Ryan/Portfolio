@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Controller Bridge</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: monospace;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #e94560; font-size: 1.5rem; margin-bottom: 10px; }
+    .status { margin: 10px 0; font-size: 1.1rem; }
+    .connected { color: #0f0; }
+    .disconnected { color: #f00; }
+    .btn {
+      padding: 12px 30px;
+      font-size: 16px;
+      background: #e94560;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn.secondary { background: #333; }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      background: #222;
+      color: #fff;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .info { color: #888; font-size: 14px; margin: 5px 0; }
+    .log { color: #0f0; font-size: 12px; max-height: 200px; overflow-y: auto; width: 100%; max-width: 500px; text-align: left; margin-top: 10px; }
+    .log-entry { color: #aaa; margin: 2px 0; }
+  </style>
+</head>
+<body>
+  <h1>Game Controller Bridge</h1>
+  <p class="status" id="ws-status">WebSocket: <span class="disconnected">Disconnected</span></p>
+  <p class="status" id="popup-status">Game Popup: <span>Not opened</span></p>
+
+  <div>
+    <label>Portfolio URL:</label><br>
+    <input type="text" id="portfolio-url" value="https://portfolio-1-eta.vercel.app" placeholder="https://your-site.vercel.app">
+  </div>
+
+  <p class="info" style="color:#ff9800;">⚠️ Allow popups for this page if prompted</p>
+  <button class="btn" id="open-game-btn">Open Game & Connect</button>
+  <button class="btn secondary" id="disconnect-btn" disabled>Disconnect</button>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    let ws = null;
+    let gamePopup = null;
+    const logEl = document.getElementById('log');
+    const wsStatus = document.getElementById('ws-status');
+    const popupStatus = document.getElementById('popup-status');
+    const openBtn = document.getElementById('open-game-btn');
+    const disconnectBtn = document.getElementById('disconnect-btn');
+    const urlInput = document.getElementById('portfolio-url');
+
+    function log(msg) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = '> ' + msg;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function connectWebSocket() {
+      const wsUrl = `ws://localhost:${location.port}`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        document.getElementById('ws-status').innerHTML = 'WebSocket: <span class="connected">Connected</span>';
+        log('WebSocket connected');
+        openBtn.disabled = false;
+      };
+
+      ws.onclose = () => {
+        document.getElementById('ws-status').innerHTML = 'WebSocket: <span class="disconnected">Disconnected</span>';
+        log('WebSocket disconnected');
+        openBtn.disabled = true;
+      };
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'input' && gamePopup && !gamePopup.closed) {
+          gamePopup.postMessage(msg, '*');
+          log(`Relayed: ${msg.action} = ${msg.pressed}`);
+        }
+      };
+
+      ws.onerror = () => {
+        log('WebSocket error');
+      };
+    }
+
+    function openGame() {
+      const url = document.getElementById('portfolio-url').value.trim();
+      if (!url) return;
+      gamePopup = window.open(url, 'gamePopup', 'width=1280,height=800');
+      if (!gamePopup || gamePopup.closed) {
+        log('Popup blocked! Allow popups for this site and try again.');
+        document.getElementById('popup-status').innerHTML = 'Game Popup: <span style="color:#f00">Blocked — allow popups</span>';
+        return;
+      }
+      document.getElementById('popup-status').innerHTML = 'Game Popup: <span style="color:#0f0">Opened</span>';
+      log('Game popup opened: ' + url);
+      disconnectBtn.disabled = false;
+
+      const checkPopup = setInterval(() => {
+        if (gamePopup.closed) {
+          document.getElementById('popup-status').innerHTML = 'Game Popup: <span style="color:#f00">Closed</span>';
+          log('Game popup was closed');
+          clearInterval(checkPopup);
+        }
+      }, 1000);
+    }
+
+    function disconnect() {
+      if (ws) ws.close();
+      if (gamePopup && !gamePopup.closed) gamePopup.close();
+      disconnectBtn.disabled = true;
+      openBtn.disabled = true;
+    }
+
+    connectWebSocket();
+  </script>
+</body>
+</html>
