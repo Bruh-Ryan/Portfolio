@@ -335,19 +335,19 @@
       });
 
       ably.connection.on('connected', () => {
-        dbg('[ABLY] Connected to channel: vb-' + room);
+        dbg('Connection event fired — showing controller UI');
         statusDot.className = 'status-dot connected';
         statusText.textContent = 'Connected';
-        connectScreen.classList.add('hidden');
-        controller.classList.remove('hidden');
+        connectScreen.style.display = 'none';
+        controller.style.display = 'flex';
       });
 
       ably.connection.on('disconnected', () => {
         dbg('[ABLY] Disconnected');
         statusDot.className = 'status-dot disconnected';
         statusText.textContent = 'Disconnected';
-        connectScreen.classList.remove('hidden');
-        controller.classList.add('hidden');
+        connectScreen.style.display = 'flex';
+        controller.style.display = 'none';
         connectMessage.textContent = 'Reconnecting...';
       });
 
