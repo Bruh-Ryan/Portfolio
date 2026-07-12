@@ -221,6 +221,11 @@ function dispatchControllerInput(msg) {
   const gameFrame = document.getElementById('gameFrame');
   if (!gameFrame || !gameFrame.src) return;
 
+  const gameOverlay = document.getElementById('gameOverlay');
+  if (!gameOverlay || !gameOverlay.classList.contains('active')) return;
+
+  gameFrame.focus();
+
   const eventType = msg.pressed ? 'keydown' : 'keyup';
   const keyboardEvent = new KeyboardEvent(eventType, {
     key: mapping.key,
