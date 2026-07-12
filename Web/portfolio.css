@@ -13,6 +13,7 @@
     /* Main Text / Dark Elements */
     --color-highlight: #DF6D14;
     /* Highlights / Orange */
+    --color-deep-teal: #2A7F6E;
 
     /* Functional Variations */
     --color-bg: var(--color-cream);
@@ -521,6 +522,12 @@ ul li::before {
     border-color: var(--color-dark-green);
 }
 
+.retro-button.download {
+    background: var(--color-deep-teal);
+    color: #fff;
+    border-color: var(--color-dark-green);
+}
+
 /* Tech Grid & Categories */
 .tech-category {
     margin-bottom: 2rem;
@@ -536,6 +543,40 @@ ul li::before {
     padding: 1.5rem;
     margin: 1.5rem 0;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Project Cards */
+.project-card {
+    margin-bottom: 2.5rem;
+    border: 2px dashed var(--color-soft-green);
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+.project-card:last-child {
+    margin-bottom: 0;
+}
+
+.project-card h3 {
+    font-family: var(--font-retro);
+    font-size: 1.8rem;
+    color: var(--color-highlight);
+    margin: 0 0 0.5rem;
+}
+
+.project-card p.story-hook {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.project-card .project-stack {
+    font-family: var(--font-retro);
+    font-size: 1rem;
+    color: var(--color-dark-green);
+    margin-bottom: 1rem;
+    opacity: 0.85;
 }
 
 /* Video Overlay */
