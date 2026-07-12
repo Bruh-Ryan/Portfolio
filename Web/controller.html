@@ -328,6 +328,11 @@
 
       const ably = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
       const channel = ably.channels.get('vb-' + room);
+      dbg('Ably state: ' + ably.connection.state);
+      channel.attach((err) => {
+        if (err) dbg('Channel attach ERROR: ' + err.message);
+        else dbg('Channel attached OK');
+      });
 
       ably.connection.on('connected', () => {
         dbg('[ABLY] Connected to channel: vb-' + room);
@@ -347,11 +352,15 @@
       });
 
       function sendInput(action, pressed) {
-        channel.publish('input', {
-          type: 'input',
-          action: action,
-          pressed: pressed,
-          player: player
+        const payload = { type: 'input', action, pressed, player };
+        console.log('[PHONE] Publishing:', payload);
+        dbg('Publishing: ' + JSON.stringify(payload));
+        channel.publish('input', payload, (err) => {
+          if (err) {
+            dbg('Publish ERROR: ' + err.message);
+          } else {
+            dbg('Publish OK');
+          }
         });
       }
 
