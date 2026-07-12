@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Game Controller</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
   <style>
     * {
       margin: 0;
@@ -326,128 +326,28 @@
         faceBKey.textContent = '[K]';
       }
 
-      const peerConfig = {
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            {
-              urls: 'turn:openrelay.metered.ca:80',
-              username: 'openrelayproject',
-              credential: 'openrelayproject'
-            },
-            {
-              urls: 'turn:openrelay.metered.ca:443',
-              username: 'openrelayproject',
-              credential: 'openrelayproject'
-            },
-            {
-              urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-              username: 'openrelayproject',
-              credential: 'openrelayproject'
-            }
-          ]
-        }
-      };
+      const ably = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
+      const channel = ably.channels.get('vb-' + room);
 
-      let peer = null;
-      let conn = null;
-      let reconnectAttempts = 0;
-      const MAX_RECONNECT = 10;
+      ably.connection.on('connected', () => {
+        dbg('[ABLY] Connected to channel: vb-' + room);
+        statusDot.className = 'status-dot connected';
+        statusText.textContent = 'Connected';
+        connectScreen.classList.add('hidden');
+        controller.classList.remove('hidden');
+      });
 
-      function backoffDelay() {
-        return Math.min(reconnectAttempts * 2000, 30000);
-      }
-
-      function connectToHost() {
-        if (reconnectAttempts >= MAX_RECONNECT) {
-          connectMessage.textContent = 'Could not connect after several attempts — scan the QR code again';
-          connectMessage.className = 'error';
-          statusText.textContent = 'Failed';
-          statusDot.className = 'status-dot disconnected';
-          return;
-        }
-
-        statusText.textContent = 'Connecting...';
-        statusDot.className = 'status-dot';
-
-        if (peer) peer.destroy();
-
-        peer = new Peer(peerConfig);
-
-        peer.on('open', (id) => {
-          dbg('[PHONE] Peer opened with ID:', id);
-          dbg('[PHONE] Attempting to connect to host: vb-' + room);
-          connectMessage.textContent = 'Connecting to game...';
-          conn = peer.connect('vb-' + room, { reliable: true });
-
-          const connTimeout = setTimeout(() => {
-            dbg('[PHONE] Connection timeout fired (30s), conn.open:', conn?.open);
-            if (conn && conn.open === false) {
-              conn.close();
-              connectMessage.textContent = 'Connection timed out — retrying...';
-              connectMessage.className = '';
-              reconnectAttempts++;
-              dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
-              setTimeout(() => connectToHost(), backoffDelay());
-            }
-          }, 30000);
-
-          conn.on('open', () => {
-            dbg('[PHONE] DataChannel open — connected to host!');
-            clearTimeout(connTimeout);
-            reconnectAttempts = 0;
-            statusDot.className = 'status-dot connected';
-            statusText.textContent = 'Connected';
-            connectScreen.classList.add('hidden');
-            controller.classList.remove('hidden');
-          });
-
-          conn.on('close', () => {
-            dbg('[PHONE] DataChannel closed');
-            statusDot.className = 'status-dot disconnected';
-            statusText.textContent = 'Disconnected';
-            connectScreen.classList.remove('hidden');
-            controller.classList.add('hidden');
-            connectMessage.textContent = 'Disconnected — attempting to reconnect...';
-            connectMessage.className = '';
-            reconnectAttempts++;
-            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
-            setTimeout(() => connectToHost(), backoffDelay());
-          });
-
-          conn.on('error', (err) => {
-            dbg('[PHONE] DataChannel error:', err);
-            clearTimeout(connTimeout);
-            connectMessage.textContent = 'Connection error — retrying...';
-            connectMessage.className = '';
-            reconnectAttempts++;
-            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
-            setTimeout(() => connectToHost(), backoffDelay());
-          });
-        });
-
-        peer.on('error', (err) => {
-          dbg('[PHONE] Peer error — type:', err.type, 'message:', err.message, err);
-          if (err.type === 'peer-unavailable') {
-            connectMessage.textContent = 'Waiting for the portfolio page to open the controller panel...';
-            connectMessage.className = '';
-            reconnectAttempts++;
-            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
-            setTimeout(() => connectToHost(), backoffDelay());
-          } else {
-            reconnectAttempts++;
-            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
-            setTimeout(() => connectToHost(), backoffDelay());
-          }
-        });
-      }
-
-      connectToHost();
+      ably.connection.on('disconnected', () => {
+        dbg('[ABLY] Disconnected');
+        statusDot.className = 'status-dot disconnected';
+        statusText.textContent = 'Disconnected';
+        connectScreen.classList.remove('hidden');
+        controller.classList.add('hidden');
+        connectMessage.textContent = 'Reconnecting...';
+      });
 
       function sendInput(action, pressed) {
-        if (!conn || conn.open === false) return;
-        conn.send({
+        channel.publish('input', {
           type: 'input',
           action: action,
           pressed: pressed,
@@ -458,7 +358,7 @@
       const buttons = document.querySelectorAll('.dpad-btn, .face-btn');
 
       document.addEventListener('touchmove', (e) => {
-        if (conn && conn.open) e.preventDefault();
+        e.preventDefault();
       }, { passive: false });
 
       buttons.forEach(btn => {

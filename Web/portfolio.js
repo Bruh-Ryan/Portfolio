@@ -275,41 +275,18 @@ window.closeGame = function () {
 };
 
 // ========================================
-// 7. MOBILE CONTROLLER PANEL (PeerJS)
+// 7. MOBILE CONTROLLER PANEL (Ably)
 // ========================================
 
 const controllerOverlay = document.getElementById('controllerOverlay');
 
-const peerConfig = {
-  config: {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' },
-      {
-        urls: 'turn:openrelay.metered.ca:80',
-        username: 'openrelayproject',
-        credential: 'openrelayproject'
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:443',
-        username: 'openrelayproject',
-        credential: 'openrelayproject'
-      },
-      {
-        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-        username: 'openrelayproject',
-        credential: 'openrelayproject'
-      }
-    ]
-  }
-};
-
 const playerState = {
-  1: { conn: null, dot: document.getElementById('statusDotP1'), text: document.getElementById('statusTextP1'), lastInput: 0 },
-  2: { conn: null, dot: document.getElementById('statusDotP2'), text: document.getElementById('statusTextP2'), lastInput: 0 }
+  1: { dot: document.getElementById('statusDotP1'), text: document.getElementById('statusTextP1'), lastInput: 0 },
+  2: { dot: document.getElementById('statusDotP2'), text: document.getElementById('statusTextP2'), lastInput: 0 }
 };
 
-let controllerPeer = null;
+let ablyClient = null;
+let ablyChannel = null;
 let controllerQR1 = null;
 let controllerQR2 = null;
 let currentRoomCode = '';
@@ -354,15 +331,12 @@ function stopInactivityTimer() {
 
 function controllerCleanup() {
     stopInactivityTimer();
-    if (controllerPeer) {
-        controllerPeer.destroy();
-        controllerPeer = null;
+    if (ablyClient) {
+        ablyClient.close();
+        ablyClient = null;
     }
+    ablyChannel = null;
     [1, 2].forEach(p => {
-        if (playerState[p].conn) {
-            playerState[p].conn.close();
-            playerState[p].conn = null;
-        }
         playerState[p].lastInput = 0;
         setPlayerStatus(p, '', 'P' + p + ' — Waiting...');
     });
@@ -377,7 +351,6 @@ window.openControllerPanel = function () {
     controllerCleanup();
 
     currentRoomCode = generateRoomCode();
-    const peerId = 'vb-' + currentRoomCode;
     document.getElementById('roomCodeDisplay').textContent = currentRoomCode;
 
     const baseUrl = window.location.origin;
@@ -406,55 +379,26 @@ window.openControllerPanel = function () {
 
     [1, 2].forEach(p => setPlayerStatus(p, '', 'P' + p + ' — Initializing...'));
 
-    controllerPeer = new Peer(peerId, peerConfig);
+    ablyClient = new Ably.Realtime({ key: 'X9_rpw.kst33g:Qnx2Cfpj6TPIqLnLhZP4r-Kn-iq04vCHKgbJX_mCj0Y' });
 
-    controllerPeer.on('open', () => {
+    ablyClient.connection.once('connected', () => {
         [1, 2].forEach(p => setPlayerStatus(p, '', 'P' + p + ' — Waiting...'));
         startInactivityTimer();
-        console.log('Controller peer ready: ' + peerId);
+        console.log('Ably connected: vb-' + currentRoomCode);
     });
 
-    controllerPeer.on('connection', (conn) => {
-        let assignedPlayer = null;
+    ablyChannel = ablyClient.channels.get('vb-' + currentRoomCode);
 
-        conn.on('data', (data) => {
-            console.log('[PEER] Data received from controller:', data);
-            if (data && data.type === 'input') {
-                const player = data.player || 1;
-                if (!assignedPlayer) {
-                    assignedPlayer = player;
-                    if (playerState[player].conn && playerState[player].conn !== conn) {
-                        playerState[player].conn.close();
-                    }
-                    playerState[player].conn = conn;
-                    setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
-                    console.log('Phone connected: P' + player);
-                }
+    ablyChannel.subscribe('input', (msg) => {
+        const data = msg.data;
+        console.log('[ABLY] Input received:', data);
+        if (data && data.type === 'input') {
+            const player = data.player || 1;
+            if (playerState[player]) {
                 playerState[player].lastInput = Date.now();
-                dispatchControllerInput(data);
+                setPlayerStatus(player, 'connected', 'P' + player + ' connected!');
             }
-        });
-
-        conn.on('close', () => {
-            if (assignedPlayer && playerState[assignedPlayer]) {
-                playerState[assignedPlayer].conn = null;
-                setPlayerStatus(assignedPlayer, 'disconnected', 'P' + assignedPlayer + ' disconnected');
-                console.log('Phone disconnected: P' + assignedPlayer);
-            }
-        });
-
-        conn.on('error', () => {
-            if (assignedPlayer && playerState[assignedPlayer]) {
-                playerState[assignedPlayer].conn = null;
-            }
-        });
-    });
-
-    controllerPeer.on('error', (err) => {
-        console.error('Controller peer error:', err);
-        if (err.type === 'unavailable-id') {
-            [1, 2].forEach(p => setPlayerStatus(p, 'disconnected', 'Room taken — retrying...'));
-            setTimeout(() => openControllerPanel(), 500);
+            dispatchControllerInput(data);
         }
     });
 
@@ -470,7 +414,7 @@ window.closeControllerPanel = function () {
 
     [1, 2].forEach(p => {
         const ps = playerState[p];
-        if (ps.conn && ps.conn.open) {
+        if (ps.lastInput > 0) {
             setPlayerStatus(p, 'connected', 'P' + p + ' connected');
         } else {
             setPlayerStatus(p, '', 'P' + p + ' — Waiting...');
