@@ -211,14 +211,19 @@ const KEY_MAP = {
 };
 
 function dispatchControllerInput(msg) {
-  if (!msg || msg.type !== 'input') return;
+  console.log('[DISPATCH] called with:', msg);
+  if (!msg || msg.type !== 'input') { console.log('[DISPATCH] early return — invalid msg'); return; }
   const player = msg.player || 1;
   const keyMap = KEY_MAP[player];
-  if (!keyMap) return;
+  if (!keyMap) { console.log('[DISPATCH] early return — no keyMap for player', player); return; }
   const mapping = keyMap[msg.action];
-  if (!mapping) return;
+  if (!mapping) { console.log('[DISPATCH] early return — no mapping for action', msg.action); return; }
+  console.log('[DISPATCH] player:', player, 'action:', msg.action, '→ mapping:', mapping);
   const gameFrame = document.getElementById('gameFrame');
-  if (!gameFrame || !gameFrame.contentWindow) return;
+  console.log('[DISPATCH] gameFrame:', gameFrame);
+  console.log('[DISPATCH] gameFrame.src:', gameFrame?.src);
+  console.log('[DISPATCH] gameFrame.contentWindow:', gameFrame?.contentWindow);
+  if (!gameFrame || !gameFrame.contentWindow) { console.log('[DISPATCH] early return — no gameFrame or contentWindow'); return; }
   const eventType = msg.pressed ? 'keydown' : 'keyup';
   const keyboardEvent = new KeyboardEvent(eventType, {
     key: mapping.key,
@@ -226,11 +231,13 @@ function dispatchControllerInput(msg) {
     bubbles: true,
     cancelable: true,
   });
+  console.log('[DISPATCH] dispatching', eventType, 'key:', mapping.key, 'code:', mapping.code);
   gameFrame.contentWindow.dispatchEvent(keyboardEvent);
+  console.log('[DISPATCH] dispatched to contentWindow');
   if (gameFrame.contentDocument) {
     gameFrame.contentDocument.dispatchEvent(keyboardEvent);
+    console.log('[DISPATCH] dispatched to contentDocument');
   }
-  console.log(`Controller: ${msg.action} ${msg.pressed ? 'pressed' : 'released'} (P${msg.player})`);
 }
 
 window.addEventListener('message', (event) => {
@@ -411,6 +418,7 @@ window.openControllerPanel = function () {
         let assignedPlayer = null;
 
         conn.on('data', (data) => {
+            console.log('[PEER] Data received from controller:', data);
             if (data && data.type === 'input') {
                 const player = data.player || 1;
                 if (!assignedPlayer) {

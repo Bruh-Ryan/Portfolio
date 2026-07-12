@@ -266,11 +266,36 @@
     </div>
   </div>
 
+  <div id="debug-log" style="
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.85);
+    color: #0f0;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 8px;
+    z-index: 9999;
+    border-top: 2px solid #DF6D14;
+  "></div>
+
   <script>
     (function() {
+      function dbg(msg) {
+        const log = document.getElementById('debug-log');
+        if (!log) return;
+        const line = document.createElement('div');
+        line.textContent = new Date().toISOString().slice(11,19) + ' ' + msg;
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+        console.log(msg);
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const room = urlParams.get('room');
       const player = parseInt(urlParams.get('player')) || 1;
+      dbg('Page loaded, room=' + room + ' player=' + player);
 
       const statusDot = document.getElementById('statusDot');
       const statusText = document.getElementById('status-text');
@@ -350,21 +375,26 @@
 
         peer = new Peer(peerConfig);
 
-        peer.on('open', () => {
+        peer.on('open', (id) => {
+          dbg('[PHONE] Peer opened with ID:', id);
+          dbg('[PHONE] Attempting to connect to host: vb-' + room);
           connectMessage.textContent = 'Connecting to game...';
           conn = peer.connect('vb-' + room, { reliable: true });
 
           const connTimeout = setTimeout(() => {
+            dbg('[PHONE] Connection timeout fired (30s), conn.open:', conn?.open);
             if (conn && conn.open === false) {
               conn.close();
               connectMessage.textContent = 'Connection timed out — retrying...';
               connectMessage.className = '';
               reconnectAttempts++;
+              dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
               setTimeout(() => connectToHost(), backoffDelay());
             }
           }, 30000);
 
           conn.on('open', () => {
+            dbg('[PHONE] DataChannel open — connected to host!');
             clearTimeout(connTimeout);
             reconnectAttempts = 0;
             statusDot.className = 'status-dot connected';
@@ -374,6 +404,7 @@
           });
 
           conn.on('close', () => {
+            dbg('[PHONE] DataChannel closed');
             statusDot.className = 'status-dot disconnected';
             statusText.textContent = 'Disconnected';
             connectScreen.classList.remove('hidden');
@@ -381,26 +412,32 @@
             connectMessage.textContent = 'Disconnected — attempting to reconnect...';
             connectMessage.className = '';
             reconnectAttempts++;
+            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
             setTimeout(() => connectToHost(), backoffDelay());
           });
 
-          conn.on('error', () => {
+          conn.on('error', (err) => {
+            dbg('[PHONE] DataChannel error:', err);
             clearTimeout(connTimeout);
             connectMessage.textContent = 'Connection error — retrying...';
             connectMessage.className = '';
             reconnectAttempts++;
+            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
             setTimeout(() => connectToHost(), backoffDelay());
           });
         });
 
         peer.on('error', (err) => {
+          dbg('[PHONE] Peer error — type:', err.type, 'message:', err.message, err);
           if (err.type === 'peer-unavailable') {
             connectMessage.textContent = 'Waiting for the portfolio page to open the controller panel...';
             connectMessage.className = '';
             reconnectAttempts++;
+            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
             setTimeout(() => connectToHost(), backoffDelay());
           } else {
             reconnectAttempts++;
+            dbg('[PHONE] Reconnect attempt ' + reconnectAttempts + ' of ' + MAX_RECONNECT);
             setTimeout(() => connectToHost(), backoffDelay());
           }
         });
