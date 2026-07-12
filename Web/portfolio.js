@@ -390,8 +390,8 @@ window.openControllerPanel = function () {
     ablyChannel = ablyClient.channels.get('vb-' + currentRoomCode);
 
     ablyChannel.subscribe('input', (msg) => {
+        console.log('[ABLY] Message received on desktop:', msg.data);
         const data = msg.data;
-        console.log('[ABLY] Input received:', data);
         if (data && data.type === 'input') {
             const player = data.player || 1;
             if (playerState[player]) {
@@ -401,6 +401,10 @@ window.openControllerPanel = function () {
             dispatchControllerInput(data);
         }
     });
+
+    // Test: publish a ping and see if it comes back
+    ablyChannel.publish('input', { type: 'ping', player: 0 });
+    console.log('[ABLY] Test ping published to channel vb-' + currentRoomCode);
 
     controllerOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
