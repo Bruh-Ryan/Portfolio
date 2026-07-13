@@ -444,3 +444,89 @@ window.closeControllerPanel = function () {
 
     console.log("Controller Panel Closed");
 };
+
+// ========================================
+// 8. BUSINESS CARD 3D TILT & GLARE
+// ========================================
+
+(function() {
+    const card = document.getElementById('businessCard');
+    const flipper = document.getElementById('cardFlipper');
+    if (!card || !flipper) return;
+
+    const glare = document.getElementById('cardGlare');
+    const holo = document.getElementById('cardHolo');
+    const shine = document.getElementById('cardShine');
+    const emailLink = document.getElementById('cardEmailLink');
+
+    card.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        card.classList.toggle('flipped');
+    });
+
+    if (emailLink) {
+        const emailAddr = 'ryanpaultirkey.work@gmail.com';
+        emailLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await navigator.clipboard.writeText(emailAddr);
+                emailLink.textContent = 'copied! ✓';
+                setTimeout(() => {
+                    emailLink.textContent = emailAddr;
+                }, 1500);
+            } catch {
+                emailLink.textContent = 'copy failed';
+            }
+        });
+    }
+
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const tiltX = ((centerY - y) / centerY) * -15;
+        const tiltY = ((x - centerX) / centerX) * 15;
+        const flipped = card.classList.contains('flipped');
+        const flipY = flipped ? 180 : 0;
+
+        flipper.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY + flipY}deg)`;
+
+        if (glare) {
+            const glareX = (x / rect.width) * 100;
+            const glareY = (y / rect.height) * 100;
+            glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%)`;
+            glare.style.opacity = '1';
+        }
+
+        if (holo) {
+            const holoX = (x / rect.width) * 100;
+            const holoY = (y / rect.height) * 100;
+            holo.style.backgroundPosition = `${holoX}% ${holoY}%`;
+        }
+
+        if (shine) {
+            const shineX = (x / rect.width) * 100;
+            shine.style.backgroundPosition = `${shineX}% 0`;
+            shine.style.animation = 'none';
+        }
+    });
+
+    card.addEventListener('mouseleave', () => {
+        const flipped = card.classList.contains('flipped');
+        flipper.style.transform = flipped ? 'rotateY(180deg)' : 'rotateX(0deg) rotateY(0deg)';
+        if (glare) {
+            glare.style.background = 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 60%)';
+            glare.style.opacity = '0';
+        }
+        if (holo) {
+            holo.style.backgroundPosition = '0% 0%';
+        }
+        if (shine) {
+            shine.style.animation = 'cardShimmer 4s ease-in-out infinite';
+            shine.style.backgroundPosition = '100% 0';
+        }
+    });
+})();
