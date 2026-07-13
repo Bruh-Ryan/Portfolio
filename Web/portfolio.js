@@ -466,16 +466,19 @@ window.closeControllerPanel = function () {
 
     if (emailLink) {
         const emailAddr = 'ryanpaultirkey.work@gmail.com';
-        emailLink.addEventListener('click', async (e) => {
+        emailLink.addEventListener('click', (e) => {
             e.preventDefault();
-            try {
-                await navigator.clipboard.writeText(emailAddr);
+            const input = document.createElement('input');
+            input.value = emailAddr;
+            input.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+            document.body.appendChild(input);
+            input.select();
+            input.setSelectionRange(0, emailAddr.length);
+            const ok = document.execCommand('copy');
+            document.body.removeChild(input);
+            if (ok) {
                 emailLink.textContent = 'copied! ✓';
-                setTimeout(() => {
-                    emailLink.textContent = emailAddr;
-                }, 1500);
-            } catch {
-                emailLink.textContent = 'copy failed';
+                setTimeout(() => { emailLink.textContent = 'e-Mail'; }, 1500);
             }
         });
     }
@@ -529,4 +532,59 @@ window.closeControllerPanel = function () {
             shine.style.backgroundPosition = '100% 0';
         }
     });
+})();
+
+/* ========================================
+   9. CARD S-CURVE ENTRANCE ANIMATION
+   ======================================== */
+
+(function() {
+    const contact = document.getElementById('contact');
+    const card = document.getElementById('businessCard');
+    if (!contact || !card) return;
+
+    const entranceThreshold = 0.75;
+
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    function updateEntrance() {
+        const wh = window.innerHeight;
+        const sectionTop = contact.offsetTop;
+        const sectionHeight = contact.offsetHeight;
+        const range = sectionHeight;
+        const startScroll = sectionTop - wh;
+
+        const currentScroll = window.scrollY;
+        const relativeScroll = Math.max(0, currentScroll - startScroll);
+        const scrollMax = document.documentElement.scrollHeight - wh;
+        const maxRelative = Math.max(0, scrollMax - startScroll);
+        let progress = Math.min(relativeScroll / range, maxRelative / range, 1);
+
+        if (progress < entranceThreshold && currentScroll < scrollMax - 1) {
+            const p = progress / entranceThreshold;
+
+            const scale = 0.03 + easeOutCubic(p) * 0.97;
+            const translateY = (1 - easeOutCubic(p)) * 80;
+            const translateX = Math.sin(p * Math.PI * 2.2) * 35 * (1 - p * 0.6);
+            const rotate = (1 - p) * -8;
+            const opacity = Math.min(1, p * 3);
+
+            card.style.transform =
+                `scale(${scale}) translateX(${translateX}px) translateY(${translateY}px) rotate(${rotate}deg)`;
+            card.style.opacity = opacity;
+            card.style.pointerEvents = 'none';
+            card.classList.remove('flipped');
+
+        } else {
+            card.style.transform = '';
+            card.style.opacity = '';
+            card.style.pointerEvents = '';
+            window.removeEventListener('scroll', updateEntrance);
+        }
+    }
+
+    window.addEventListener('scroll', updateEntrance, { passive: true });
+    updateEntrance();
 })();
